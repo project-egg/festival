@@ -13,7 +13,7 @@
   border: 0;
   box-shadow: 0px 1px 2px #888;
 }
-.customoverlay a {
+.customoverlay .overlay {
   display: block;
   text-decoration: none;
   color: #000;
@@ -60,4 +60,12 @@
   background: goldenrod;
   border: 1px solid red;
   margin: 10px;
+}
+
+/* 모달 테스트 */
+#modal {
+  width: 700px;
+  height: 700px;
+  border: 3px solid #000;
+  background: white;
 }
