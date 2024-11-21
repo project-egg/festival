@@ -25,7 +25,7 @@ async function fetchFestivalData(apiUrl) {
     const jsonData = xmlToJson(XmlNode);
     const festivalRes = jsonData.response.body.items.item;
     const filteredByTodayData = festivalRes.filter((data)=>{
-      return data.fstvlStartDate > today;
+      return data.fstvlEndDate > today;
     })
 
     return filteredByTodayData;
