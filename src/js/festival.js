@@ -32,4 +32,4 @@ async function fetchFestivalData(apiUrl) {
   
 }
   
-  export {festivalDatas} ;
+  export default festivalDatas;

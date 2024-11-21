@@ -1,53 +1,62 @@
-import { festivalDatas } from "./festival.js";
+import festivalDatas from "./festival.js";
+import { setCalendarDate } from "./calendar.js";
 
-const $searchBtn = document.getElementById('searchBtn');
-const $startDay = document.getElementById('start-calendar');
-const $endDay = document.getElementById('end-calendar');
-
-function setCalendarDate(){
-  const date = new Date();
-  const weekFromDate =  new Date();
-  weekFromDate.setDate(date.getDate() + 7);
-  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-    2,
-    "0"
-    
-  )}-${String(date.getDate()).padStart(2, "0")}`;
-  const weekFromToday = `${weekFromDate.getFullYear()}-${String(weekFromDate.getMonth() + 1).padStart(
-    2,
-    "0"
-    
-  )}-${String(weekFromDate.getDate()).padStart(2, "0")}`;
-
-  if($startDay.value){
-    console.log('true');
-    
-    const weekFromDate =  new Date($startDay.value);
-    console.log(weekFromDate);
-    
-    weekFromDate.setDate(date.getDate() + 7);
-    const weekFromToday = `${weekFromDate.getFullYear()}-${String(weekFromDate.getMonth() + 1).padStart(
-      2,
-      "0"
-      
-    )}-${String(weekFromDate.getDate()).padStart(2, "0")}`;
-    $endDay.value = weekFromToday;
-  }else{
-    console.log('false');
-    $startDay.value = today;
-    $endDay.value = weekFromToday;
-  }
-}
+const $searchBtn = document.getElementById("searchBtn");
+const $startDay = document.getElementById("start-calendar");
+const $endDay = document.getElementById("end-calendar");
+const $infoSection = document.querySelector(".info-section");
+const $festivalGrid = document.querySelector(".festival-grid");
+const $festivalCard = document.querySelector(".festival-card");
 
 setCalendarDate();
 
+// 특수문자 변환
+function unescapeHtml(str) {
+  const doc = new DOMParser().parseFromString(str, "text/html");
+  return doc.body.textContent || "";
+}
 
+// 데이터 필터하고 리스트업하는 함수
+function rendData(datas) {
+  const startDay = $startDay.value;
+  const endDay = $endDay.value;
 
-$startDay.addEventListener('input',e=>{
-  setCalendarDate();
-});
+  console.log(datas);
 
-$searchBtn.addEventListener('click',e=>{
-  const $startDay = $startDay.value;
-  const $endDay = $endDay.value;
+  // 날짜 조건에 맞게 필터
+  const filterData = datas.filter(
+    (data) => startDay <= data.fstvlEndDate && data.fstvlEndDate <= endDay
+  );
+
+  console.log("filter", filterData);
+
+  //리스트 초기화
+  $festivalGrid.innerHTML = "";
+
+  filterData.forEach((data) => {
+    const transText = unescapeHtml(data.fstvlNm);
+    let address = null;
+    if (
+      data.rdnmadr ||
+      (typeof data.rdnmadr === "object" && data.rdnmadr !== null)
+    ) {
+      address = data.rdnmadr;
+    } else if (data.lnmadr) {
+      address = data.lnmadr;
+    } else {
+      address = "주소없음";
+    }
+
+    const $newFestivalCard = document.createElement("div");
+    $newFestivalCard.classList.add("festival-card");
+    $newFestivalCard.setAttribute("id", data.insttCode);
+    $newFestivalCard.innerHTML = `              <h3>${transText}</h3>
+      <p>${data.fstvlStartDate} ~ ${data.fstvlEndDate}</p>
+      <p>${address}</p>`;
+    $festivalGrid.append($newFestivalCard);
+  });
+}
+
+$searchBtn.addEventListener("click", (e) => {
+  rendData(festivalDatas);
 });

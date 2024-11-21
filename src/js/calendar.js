@@ -1,8 +1,15 @@
+const $startDay = document.getElementById("start-calendar");
+const $endDay = document.getElementById("end-calendar");
+
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
+let selectedDate = null;
+
+const inputElementStart = document.getElementById("start-calendar");
+const inputElementEnd = document.getElementById("start-calendar");
 
 console.log(today);
 
@@ -18,10 +25,15 @@ console.log(today);
 
 const pickerStart = new Pikaday({
   field: document.getElementById("start-calendar"),
+  onSelect: function (date) {
+    selectedDate = formatDate(date);
+    setCalendarDate(selectedDate);
+  },
   firstDay: 1,
-  minDate: new Date(2024, 10, 1),  // 2024년 11월 1일부터
+  minDate: new Date(2024, 10, 1), // 2024년 11월 1일부터
   maxDate: new Date(2025, 12, 31), // 2024년 12월 31일까지
   yearRange: [2024, 2025],
+  format: 'D MMM YYYY',
   i18n: {
     previousMonth: "Previous Month",
     nextMonth: "Next Month",
@@ -70,6 +82,15 @@ const pickerStart = new Pikaday({
 
 const pickerEnd = new Pikaday({
   field: document.getElementById("end-calendar"),
+  onSelect: function(date) {
+    selectedDate = formatDate(date);
+    setCalendarDate(selectedDate);
+  },
+  firstDay: 1,
+  minDate: new Date(2024, 10, 1), // 2024년 11월 1일부터
+  maxDate: new Date(2025, 12, 31), // 2024년 12월 31일까지
+  yearRange: [2024, 2025],
+  format: 'D MMM YYYY',
   i18n: {
     previousMonth: "Previous Month",
     nextMonth: "Next Month",
@@ -98,6 +119,7 @@ const pickerEnd = new Pikaday({
     ],
     weekdaysShort: ["일", "월", "화", "수", "목", "금", "토"],
   },
+
   toString(date, format) {
     // yyyy-mm-dd 형식 (2024-01-01)
     const day = String(date.getDate()).padStart(2, "0");
@@ -107,7 +129,7 @@ const pickerEnd = new Pikaday({
   },
   parse(dateString, format) {
     // dateString is the result of `toString` method
-    const parts = dateString.split("/");
+    const parts = dateString.split("-");
     const day = parseInt(parts[0], 10);
     const month = parseInt(parts[1], 10) - 1;
     const year = parseInt(parts[2], 10);
@@ -115,10 +137,66 @@ const pickerEnd = new Pikaday({
   },
 });
 
-{
-  /* <input type="text" id="calendar">    
-    
-<script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
-<script src="./src/js/calendar.js"></script> */
+
+function setCalendarDate(inputDate) {
+  // 시작일이 변경되면 시작일 기준으로 종료일이 +7일 되는 부분 (안씀 지금은)
+  const date = new Date();
+  
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(date.getDate()).padStart(2, "0")}`;
+  
+  // 초기 날짜 세팅
+  if (!$startDay.value) {
+    console.log("false");
+    $startDay.value = today;
+    $endDay.value = addSevenDays(today);
+    return;
+  }
+  
+
+  // 1. 종료일이 시작일보다 이전일 경우
+  // 20일~인데 ~1일을 하려고함
+  if ($startDay.value > inputDate) {
+
+    $startDay.value = divSevenDays(inputDate);
+    // 2. 시작일이 종료일보다 이후일 경우
+    // ~20일 인데 21일~을 하려고함
+  } else if (inputDate > $endDay.value) {
+
+    $endDay.value = addSevenDays(inputDate);
+  }
 }
+
+
+function formatDate(date) {
+  // 로컬 시간대에 맞게 날짜를 yyyy-mm-dd 형식으로 변환
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  
+  return `${year}-${month}-${day}`;
+}
+
+function addSevenDays(beforeDate) {
+  const date2 = new Date(beforeDate);
+  const date = new Date();
+  date.setDate(date2.getDate() + 7);
+  const afterDate = `${date.getFullYear()}-${String(
+    date.getMonth() + 1
+  ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  return afterDate
+}
+
+function divSevenDays(beforeDate) {
+  
+  const date2 = new Date(beforeDate);
+  const date = new Date();
+  date.setDate(date2.getDate() - 7);
+  const afterDate = `${date.getFullYear()}-${String(
+    date.getMonth() + 1
+  ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  return afterDate
+}
+export { setCalendarDate };
