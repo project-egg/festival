@@ -35,6 +35,9 @@
   font-size: 11px;
   font-weight: bold;
 }
+.customoverlay .selected-title {
+  background: yellow;
+}
 .customoverlay:after {
   content: "";
   position: absolute;
@@ -44,4 +47,17 @@
   width: 22px;
   height: 12px;
   background: url("https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png");
+}
+
+/* 축제 정보 클릭 테스트 */
+.festival-info {
+  width: 600px;
+  height: 700px;
+  background: rgb(212, 178, 114);
+}
+.festival-info .festival-summary {
+  font-size: 1.2rem;
+  background: goldenrod;
+  border: 1px solid red;
+  margin: 10px;
 }
