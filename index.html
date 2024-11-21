@@ -4,12 +4,138 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="stylesheet" href="src/css/map.css">
+    <!-- <link rel="stylesheet" href="src/css/map.css" /> -->
+    <link rel="stylesheet" href="./src/css/main.css" />
+    <!-- Font Awesome CDN 추가 -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <div>project-egg</div>
+    <header>
+      <div class="logo">프로젝트명</div>
 
-    <div id="map" style="width: 450px; height: 650px"></div>
+      
+      <div class="search-bar">
+        <!-- 검색창 HTML -->
+        <input type="text" placeholder="검색어를 입력하세요" />
+        <button><i class="fa-solid fa-magnifying-glass"></i></button>
+      </div>
+    </header>
+
+    <div class="region-and-monthly">
+      <section class="filters">
+        <button>지역</button>
+      </section>
+
+      <section class="month-to-month">
+        <button>월별 드롭다운</button>
+      </section>
+    </div>
+
+    <div class="main-container">
+      <!-- 지도 영역 -->
+      <div id="map" style="width: 450px; height: 650px"></div>
+      <!-- 정보 표시 영역 -->
+      <div class="info-section">
+        <div class="festival-grid">
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <div class="festival-card">
+            <h3>축제명</h3>
+            <p>축제기간</p>
+            <p>장소</p>
+          </div>
+          <!-- 카드 추가 가능 -->
+        </div>
+      </div>
+    </div>
+
+
     <script
       type="text/javascript"
       src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a37b0a7851906a105de603997f89eea0"
