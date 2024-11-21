@@ -61,6 +61,10 @@
   border: 1px solid red;
   margin: 10px;
 }
+.festival-info .selected-summary {
+  background: rgb(140, 216, 54);
+}
+
 
 /* 모달 테스트 */
 #modal {
