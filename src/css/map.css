@@ -48,28 +48,3 @@
   height: 12px;
   background: url("https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png");
 }
-
-/* 축제 정보 클릭 테스트 */
-.festival-info {
-  width: 600px;
-  height: 700px;
-  background: rgb(212, 178, 114);
-}
-.festival-info .festival-summary {
-  font-size: 1.2rem;
-  background: goldenrod;
-  border: 1px solid red;
-  margin: 10px;
-}
-.festival-info .selected-summary {
-  background: rgb(140, 216, 54);
-}
-
-
-/* 모달 테스트 */
-#modal {
-  width: 700px;
-  height: 700px;
-  border: 3px solid #000;
-  background: white;
-}

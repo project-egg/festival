@@ -52,7 +52,6 @@ function createMarkerAndOverlay(position, festival) {
 
 // 선택된 오버레이 색 변경
 function HighlightOverlay(selectedId) {
-  console.log("highlightOverlay");
   
   // 현재 선택된 id와 다를 경우에만 클래스 제거 및 추가
   if (currentSelectedId !== selectedId) {
@@ -76,6 +75,8 @@ function HighlightOverlay(selectedId) {
 }
 
 function rendMap(data) {
+  console.log(`rendMap ${data.length}`);
+  
   // 축제 데이터를 기반으로 마커와 오버레이 생성
   data.forEach((festival) => {
     const latitude = parseFloat(festival.latitude);

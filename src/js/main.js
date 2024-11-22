@@ -2,7 +2,6 @@ import festivalDatas from "./festival.js";
 import { setCalendarDate } from "./calendar.js";
 import { rendMap, HighlightOverlay } from "./map.js";
 
-
 const $infoSection = document.querySelector(".info-section");
 
 // 드랍다운 DOM
@@ -44,9 +43,9 @@ function rendData(datas) {
     )
     // 지역 조건에 맞게 필터
     .filter((data) => {
-      let address = null; 
-      
-      // 도로명주소 우선 
+      let address = null;
+
+      // 도로명주소 우선
       if (data.rdnmadr !== null && typeof data.rdnmadr === "object") {
         address = data.lnmadr;
       } else {
@@ -60,6 +59,7 @@ function rendData(datas) {
       return address.includes(selectedDropdown);
     });
 
+  
   console.log("filter", filterData);
 
   //리스트 초기화
@@ -86,10 +86,12 @@ function rendData(datas) {
       <p>${data.fstvlStartDate} ~ ${data.fstvlEndDate}</p>
       <p>${address}</p>`;
     $festivalGrid.append($newFestivalCard);
-  });
+  });  
+  
 }
 
 $searchBtn.addEventListener("click", (e) => {
+
   rendData(festivalDatas);
 });
 
@@ -97,7 +99,14 @@ $dropdown.addEventListener("click", (e) => {
   $dropdownToggle.textContent = e.target.innerText;
 });
 $dropdownMenu.addEventListener("click", (e) => {
-  console.log('click');
-  
+  console.log("click");
+
   rendData(festivalDatas);
+});
+
+$festivalGrid.addEventListener("click", (e) => {
+  const festivalCard = e.target.closest(".festival-card")
+  if (festivalCard) {    
+    HighlightOverlay(festivalCard.id);
+  }
 });
