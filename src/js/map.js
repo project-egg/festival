@@ -1,10 +1,7 @@
 import festivalDatas from "./festival.js";
 
-console.log(festivalDatas);
-
 const container = document.getElementById("map"); // 지도를 담을 영역의 DOM 레퍼런스
-const $festival_info = document.querySelector(".festival-info"); // 축제 정보 영역의 DOM 레퍼런스
-const $modal = document.getElementById("modal"); // 모달 팝업 요소
+let currentSelectedId = null; // 현재 선택된 id를 저장
 
 const options = {
   center: new kakao.maps.LatLng(36, 127.6), // 지도의 중심좌표
@@ -31,6 +28,7 @@ function createMarkerAndOverlay(position, festival) {
 
   const content = document.createElement("div");
   content.className = "customoverlay";
+  content.setAttribute("data-id", festival.id); // data-id 속성 추가
   content.innerHTML = `
     <div class="overlay">
       <span class="title">${festival.fstvlNm}</span>
@@ -48,32 +46,32 @@ function createMarkerAndOverlay(position, festival) {
   const overlayLink = content.querySelector(".overlay");
   overlayLink.addEventListener("click", (e) => {
     e.preventDefault(); // 기본 링크 동작 방지
-    HighlightOverlayAndSummary(festival.id);
+    HighlightOverlay(festival.id);
   });
 }
 
-// TODO : 변수 정리 해주는게 좋을듯
-function HighlightOverlayAndSummary(i) {
-  // Highlight Overlay
-  const allTitles = document.querySelectorAll(".customoverlay .title");
+// 선택된 오버레이 색 변경
+function HighlightOverlay(selectedId) {
+  console.log("highlightOverlay");
+  
+  // 현재 선택된 id와 다를 경우에만 클래스 제거 및 추가
+  if (currentSelectedId !== selectedId) {
+    // 기존 선택 요소 제거
+    if (currentSelectedId !== null) {
+      const previouslySelectedTitle = document.querySelector(`.customoverlay[data-id='${currentSelectedId}'] .title`);
+      if (previouslySelectedTitle) {
+        previouslySelectedTitle.classList.remove("selected-title"); // 이전 선택 클래스 제거
+      }
+    }
 
-  // 기존 선택 요소 제거
-  allTitles[i].classList.remove("selected-title");
+    // 선택된 제목에 클래스 추가
+    const selectedTitle = document.querySelector(`.customoverlay[data-id='${selectedId}'] .title`);
+    if (selectedTitle) {
+      selectedTitle.classList.add("selected-title");
+    }
 
-  const selectedTitle = allTitles[i]; // 인덱스를 사용하여 선택된 요소 찾기
-  if (selectedTitle) {
-    selectedTitle.classList.add("selected-title");
-  }
-
-  // Highlight Summary
-  const allSummaries = Array.from($festival_info.children); // $festival_info의 자식 요소를 배열로 변환
-  allSummaries.forEach((info) => {
-    info.classList.remove("selected-summary");
-  });
-
-  const selectedInfo = $festival_info.children[i]; // 인덱스를 사용하여 선택된 요소 찾기
-  if (selectedInfo) {
-    selectedInfo.classList.add("selected-summary");
+    // 현재 선택된 id 업데이트
+    currentSelectedId = selectedId;
   }
 }
 
@@ -107,4 +105,4 @@ function rendMap(data) {
 }
 
 rendMap(festivalDatas);
-export { rendMap };
+export { rendMap, HighlightOverlay };

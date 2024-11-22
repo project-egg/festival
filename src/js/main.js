@@ -1,5 +1,7 @@
 import festivalDatas from "./festival.js";
 import { setCalendarDate } from "./calendar.js";
+import { rendMap, HighlightOverlay } from "./map.js";
+
 
 const $dropdown = document.querySelector(".dropdown-menu");
 const $dropdownToggle = document.querySelector(".dropdown-toggle");
