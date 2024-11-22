@@ -3,16 +3,24 @@ import { setCalendarDate } from "./calendar.js";
 import { rendMap, HighlightOverlay } from "./map.js";
 
 
+const $infoSection = document.querySelector(".info-section");
+
+// 드랍다운 DOM
 const $dropdown = document.querySelector(".dropdown-menu");
 const $dropdownToggle = document.querySelector(".dropdown-toggle");
+const $dropdownMenu = document.querySelector(".dropdown-menu");
+
 const $searchBtn = document.getElementById("searchBtn");
 const $startDay = document.getElementById("start-calendar");
+
 const $endDay = document.getElementById("end-calendar");
-const $infoSection = document.querySelector(".info-section");
+
+// 리스트 DOM
 const $festivalGrid = document.querySelector(".festival-grid");
 const $festivalCard = document.querySelector(".festival-card");
 
 setCalendarDate();
+rendData(festivalDatas);
 
 // 특수문자 변환
 function unescapeHtml(str) {
@@ -33,7 +41,24 @@ function rendData(datas) {
   const filterData = datas
     .filter(
       (data) => startDay <= data.fstvlEndDate && data.fstvlEndDate <= endDay
-    );
+    )
+    // 지역 조건에 맞게 필터
+    .filter((data) => {
+      let address = null; 
+      
+      // 도로명주소 우선 
+      if (data.rdnmadr !== null && typeof data.rdnmadr === "object") {
+        address = data.lnmadr;
+      } else {
+        address = data.rdnmadr;
+      }
+
+      // 전체는 모든 데이터 반환
+      if (selectedDropdown.includes("전체")) {
+        return data;
+      }
+      return address.includes(selectedDropdown);
+    });
 
   console.log("filter", filterData);
 
@@ -56,7 +81,7 @@ function rendData(datas) {
 
     const $newFestivalCard = document.createElement("div");
     $newFestivalCard.classList.add("festival-card");
-    $newFestivalCard.setAttribute("id", data.insttCode);
+    $newFestivalCard.setAttribute("id", data.id);
     $newFestivalCard.innerHTML = `              <h3>${transText}</h3>
       <p>${data.fstvlStartDate} ~ ${data.fstvlEndDate}</p>
       <p>${address}</p>`;
@@ -70,4 +95,9 @@ $searchBtn.addEventListener("click", (e) => {
 
 $dropdown.addEventListener("click", (e) => {
   $dropdownToggle.textContent = e.target.innerText;
+});
+$dropdownMenu.addEventListener("click", (e) => {
+  console.log('click');
+  
+  rendData(festivalDatas);
 });
