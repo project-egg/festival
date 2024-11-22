@@ -1,12 +1,19 @@
 import festivalDatas from "./festival.js";
 import { setCalendarDate } from "./calendar.js";
 
+const $infoSection = document.querySelector(".info-section");
+
+// 드랍다운 DOM
 const $dropdown = document.querySelector(".dropdown-menu");
 const $dropdownToggle = document.querySelector(".dropdown-toggle");
+const $dropdownMenu = document.querySelector(".dropdown-menu");
+
 const $searchBtn = document.getElementById("searchBtn");
 const $startDay = document.getElementById("start-calendar");
+
 const $endDay = document.getElementById("end-calendar");
-const $infoSection = document.querySelector(".info-section");
+
+// 리스트 DOM
 const $festivalGrid = document.querySelector(".festival-grid");
 const $festivalCard = document.querySelector(".festival-card");
 
@@ -22,6 +29,7 @@ const overlay = document.querySelector("#overlay");
 const $newWindowBody = document.querySelector('.new-window-body');
 
 setCalendarDate();
+rendData(festivalDatas);
 
 // 특수문자 변환
 function unescapeHtml(str) {
@@ -42,7 +50,24 @@ function rendData(datas) {
   const filterData = datas
     .filter(
       (data) => startDay <= data.fstvlEndDate && data.fstvlEndDate <= endDay
-    );
+    )
+    // 지역 조건에 맞게 필터
+    .filter((data) => {
+      let address = null; 
+      
+      // 도로명주소 우선 
+      if (data.rdnmadr !== null && typeof data.rdnmadr === "object") {
+        address = data.lnmadr;
+      } else {
+        address = data.rdnmadr;
+      }
+
+      // 전체는 모든 데이터 반환
+      if (selectedDropdown.includes("전체")) {
+        return data;
+      }
+      return address.includes(selectedDropdown);
+    });
 
   console.log("filter", filterData);
 
@@ -98,8 +123,6 @@ document.addEventListener("keydown", (e) => {
 });
 
 
-
-
 $festivalGrid.addEventListener('click',e=>{
 const target = e.target;
 const itemNode = target.closest('.festival-card');
@@ -142,3 +165,10 @@ $newWindowBody.innerHTML =
 <p>전화번호:${numbers}</p>
 <p>홈페이지주소:${address}</p>`;
 });
+
+$dropdownMenu.addEventListener("click", (e) => {
+  console.log('click');
+  
+  rendData(festivalDatas);
+});
+
