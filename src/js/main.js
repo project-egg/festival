@@ -1,6 +1,8 @@
 import festivalDatas from "./festival.js";
 import { setCalendarDate } from "./calendar.js";
 
+const $dropdown = document.querySelector(".dropdown-menu");
+const $dropdownToggle = document.querySelector(".dropdown-toggle");
 const $searchBtn = document.getElementById("searchBtn");
 const $startDay = document.getElementById("start-calendar");
 const $endDay = document.getElementById("end-calendar");
@@ -21,12 +23,15 @@ function rendData(datas) {
   const startDay = $startDay.value;
   const endDay = $endDay.value;
 
+  const selectedDropdown = $dropdownToggle.innerText;
+
   console.log(datas);
 
   // 날짜 조건에 맞게 필터
-  const filterData = datas.filter(
-    (data) => startDay <= data.fstvlEndDate && data.fstvlEndDate <= endDay
-  );
+  const filterData = datas
+    .filter(
+      (data) => startDay <= data.fstvlEndDate && data.fstvlEndDate <= endDay
+    );
 
   console.log("filter", filterData);
 
@@ -36,14 +41,14 @@ function rendData(datas) {
   filterData.forEach((data) => {
     const transText = unescapeHtml(data.fstvlNm);
     let address = null;
-    if (
-      data.rdnmadr ||
-      (typeof data.rdnmadr === "object" && data.rdnmadr !== null)
-    ) {
-      address = data.rdnmadr;
-    } else if (data.lnmadr) {
+
+    // 주소 도로명 주소 우선 표시
+    if (data.rdnmadr !== null && typeof data.rdnmadr === "object") {
       address = data.lnmadr;
     } else {
+      address = data.rdnmadr;
+    }
+    if (!address) {
       address = "주소없음";
     }
 
@@ -59,4 +64,8 @@ function rendData(datas) {
 
 $searchBtn.addEventListener("click", (e) => {
   rendData(festivalDatas);
+});
+
+$dropdown.addEventListener("click", (e) => {
+  $dropdownToggle.textContent = e.target.innerText;
 });
