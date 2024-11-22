@@ -20,10 +20,8 @@ const $festivalCard = document.querySelector(".festival-card");
 
 
 // 요소 선택
-// const openModalButton = document.getElementById("open-modal");
 const closeWindowButton = document.getElementById("close-window");
 const newWindow = document.getElementById("new-window");
-// const overlay = document.getElementById("overlay");
 const overlay = document.querySelector("#overlay");
 
 // 모달 DOM
@@ -106,12 +104,6 @@ $searchBtn.addEventListener("click", (e) => {
   rendData(festivalDatas);
 });
 
-// 새로운 창 열기
-// openModalButton.addEventListener("click", () => {
-//   newWindow.classList.remove("hidden");
-//   overlay.classList.remove("hidden");
-// });
-
 // 새로운 창 닫기
 closeWindowButton.addEventListener("click", closeNewWindow);
 overlay.addEventListener("click", closeNewWindow);
@@ -168,6 +160,10 @@ $newWindowBody.innerHTML =
 <p>주최기관명:${institutionalname}</p> 
 <p>전화번호:${numbers}</p>
 <p>홈페이지주소:${address}</p>`;
+});
+
+$dropdown.addEventListener("click", (e) => {
+  $dropdownToggle.textContent = e.target.innerText;
 });
 
 $dropdownMenu.addEventListener("click", (e) => {

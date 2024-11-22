@@ -25,21 +25,25 @@ async function fetchFestivalData(apiUrl) {
     const jsonData = xmlToJson(XmlNode);
     const festivalRes = jsonData.response.body.items.item;
     let index = 0;
+    console.log(festivalRes);
+    
     const filteredByTodayData = festivalRes.filter((data)=>{
       return data.fstvlEndDate >= today;
     }).map(data=>{
       return {
-        auspcInsttNm: data.auspcInsttNm,
-        fstvlCo: data.fstvlCo,
-        fstvlEndDate: data.fstvlEndDate,
-        fstvlNm: data.fstvlNm,
-        fstvlStartDate: data.fstvlStartDate,
-        homepageUrl: data.homepageUrl,
-        lnmadr: data.lnmadr,
-        mnnstNm: data.mnnstNm,
-        opar: data.opar,
-        phoneNumber: data.phoneNumber,
-        rdnmadr: data.rdnmadr,
+        latitude : data.latitude,
+        longitude: data.longitude,
+        auspcInsttNm: data.auspcInsttNm,  // 축제기관
+        fstvlCo: data.fstvlCo,  // 축제 상세
+        fstvlEndDate: data.fstvlEndDate, // 종료일
+        fstvlNm: data.fstvlNm, // 축제이름
+        fstvlStartDate: data.fstvlStartDate, // 시작일
+        homepageUrl: data.homepageUrl, // 홈페이지 주소
+        lnmadr: data.lnmadr, // 지번
+        mnnstNm: data.mnnstNm, // 개최기관?
+        opar: data.opar, // 장소명
+        phoneNumber: data.phoneNumber, //전화번호
+        rdnmadr: data.rdnmadr, // 도로명주소
         id: index++, // id 값에 인덱스를 1씩 증가
       };
     })
