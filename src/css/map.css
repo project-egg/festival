@@ -13,7 +13,7 @@
   border: 0;
   box-shadow: 0px 1px 2px #888;
 }
-.customoverlay a {
+.customoverlay .c-overlay {
   display: block;
   text-decoration: none;
   color: #000;
@@ -34,6 +34,9 @@
   padding: 3px 5px;
   font-size: 11px;
   font-weight: bold;
+}
+.customoverlay .selected-title {
+  background: yellow;
 }
 .customoverlay:after {
   content: "";

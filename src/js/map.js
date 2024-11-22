@@ -1,79 +1,131 @@
-import { festivalDatas } from "./xmlToJson.js";
+import festivalDatas from "./festival.js";
 
-const container = document.getElementById("map"); //지도를 담을 영역의 DOM 레퍼런스
+const container = document.getElementById("map"); // 지도를 담을 영역의 DOM 레퍼런스
+let currentSelectedId = null; // 현재 선택된 id를 저장
+let markers = [];
+let overlays = []; 
+
 const options = {
-  //지도를 생성할 때 필요한 기본 옵션
-  center: new kakao.maps.LatLng(36, 127.6), //지도의 중심좌표 위도(latitude), 경도(longitude)순
-  level: 13, //지도의 레벨(확대, 축소 정도)
+  center: new kakao.maps.LatLng(36.2, 127.6), // 지도의 중심좌표
+  level: 13, // 지도의 레벨
 };
 
-const map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+const map = new kakao.maps.Map(container, options); // 지도 생성 및 객체 리턴
+const geocoder = new kakao.maps.services.Geocoder(); // 주소-좌표 변환 객체 생성
 
-// 마커를 표시할 위치와 title 객체 배열입니다
-let festivalData = [
-  {
-    title: "오(oh) 해피 산타 마켓",
-    latitude: 37.145359,
-    longitude: 127.070236,
-  },
-  {
-    title: "제28회 파주장단콩축제",
-    latitude: 37.8895387556,
-    longitude: 126.7401858799,
-  },
-  {
-    title: "11월 마토예술제<겨울이야기(가칭)>",
-    latitude: 36.95955991,
-    longitude: 127.043999,
-  },
-  {
-    title: "서천철새여행",
-    latitude: 36.02280046,
-    longitude: 126.7426918,
-  },
-];
+function unescapeHtml(str) {
+  const doc = new DOMParser().parseFromString(str, "text/html");
+  return doc.body.textContent || "";
+}
 
-// TODO : 마커 사이즈에 따른 ImageOption offset 변동하도록 수정
-festivalData.forEach((festival) => {
-  var imageSrc = "../../assets/images/festival.png", // 마커이미지의 주소입니다
-    imageSize = new kakao.maps.Size(25, 25), // 마커이미지의 크기입니다
-    imageOption = { offset: new kakao.maps.Point(12.5, 12.5) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+// 마커와 커스텀 오버레이를 생성하는 함수
+function createMarkerAndOverlay(position, festival) {
+  const markerImage = new kakao.maps.MarkerImage(
+    "../../assets/images/festival.png",
+    new kakao.maps.Size(25, 25),
+    { offset: new kakao.maps.Point(12.5, 12.5) }
+  );
 
-  // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
-  var markerImage = new kakao.maps.MarkerImage(
-      imageSrc,
-      imageSize,
-      imageOption
-    ),
-    markerPosition = new kakao.maps.LatLng(
-      festival.latitude,
-      festival.longitude
-    ); // 마커가 표시될 위치입니다
-
-  // 마커를 생성합니다
-  var marker = new kakao.maps.Marker({
-    position: markerPosition,
-    image: markerImage, // 마커이미지 설정
+  const marker = new kakao.maps.Marker({
+    position: position,
+    image: markerImage,
   });
 
-  // 마커가 지도 위에 표시되도록 설정합니다
-  marker.setMap(map);
+  marker.setMap(map); // 마커를 지도 위에 표시
+  markers.push(marker); // 마커를 배열에 추가
 
-  // 커스텀 오버레이에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
-  var content = `<div class="customoverlay">
-            <a href="https://map.kakao.com/link/map/11394059" target="_blank">
-              <span class="title">${festival.title}</span>
-            </a>
-          </div>`;
+  const content = document.createElement("div");
+  content.className = "customoverlay";
+  content.setAttribute("data-id", festival.id); // data-id 속성 추가
+  
+  const festivalTitle = unescapeHtml(festival.fstvlNm);
+  content.innerHTML = `
+    <div class="c-overlay">
+      <span class="title">${festivalTitle}</span>
+    </div>
+  `;
 
-  // 커스텀 오버레이가 표시될 위치입니다
-  var position = new kakao.maps.LatLng(festival.latitude, festival.longitude);
-
-  // 커스텀 오버레이를 생성합니다
-  var customOverlay = new kakao.maps.CustomOverlay({
+  const customOverlay = new kakao.maps.CustomOverlay({
     map: map,
     position: position,
     content: content,
     yAnchor: 0,
   });
-});
+
+  overlays.push(customOverlay); // 오버레이를 배열에 추가
+
+  // 오버레이 클릭 이벤트 리스너 추가
+  const overlayLink = content.querySelector(".c-overlay");
+  overlayLink.addEventListener("click", (e) => {
+    e.preventDefault(); // 기본 링크 동작 방지
+    HighlightOverlay(festival.id);
+  });
+}
+
+// 선택된 오버레이 색 변경
+function HighlightOverlay(selectedId) {
+  
+  // 현재 선택된 id와 다를 경우에만 클래스 제거 및 추가
+  if (currentSelectedId !== selectedId) {
+    // 기존 선택 요소 제거
+    if (currentSelectedId !== null) {
+      const previouslySelectedTitle = document.querySelector(`.customoverlay[data-id='${currentSelectedId}'] .title`);
+      if (previouslySelectedTitle) {
+        previouslySelectedTitle.classList.remove("selected-title"); // 이전 선택 클래스 제거
+      }
+    }
+
+    // 선택된 제목에 클래스 추가
+    const selectedTitle = document.querySelector(`.customoverlay[data-id='${selectedId}'] .title`);
+    if (selectedTitle) {
+      selectedTitle.classList.add("selected-title");
+    }
+
+    // 현재 선택된 id 업데이트
+    currentSelectedId = selectedId;
+  }
+}
+
+function rendMap(data) {
+  console.log(`rend : ${data.length}`);
+  
+  // 기존 마커와 오버레이 제거
+  markers.forEach(marker => {
+    marker.setMap(null); // 지도에서 마커 제거
+  });
+  markers = []; // 마커 배열 초기화
+
+  overlays.forEach(overlay => {
+    overlay.setMap(null); // 지도에서 오버레이 제거
+  });
+  overlays = []; // 오버레이 배열 초기화
+
+  // 축제 데이터를 기반으로 마커와 오버레이 생성
+  data.forEach((festival) => {
+    const latitude = parseFloat(festival.latitude);
+    const longitude = parseFloat(festival.longitude);
+
+    // 위도와 경도 유효성 검사
+    if (
+      isNaN(latitude) ||
+      isNaN(longitude) ||
+      latitude < -90 ||
+      latitude > 90 ||
+      longitude < -180 ||
+      longitude > 180
+    ) {
+      // 주소로 좌표를 검색
+      geocoder.addressSearch(festival.rdnmadr, function (result, status) {
+        if (status === kakao.maps.services.Status.OK) {
+          const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+          createMarkerAndOverlay(coords, festival);
+        }
+      });
+    } else {
+      const markerPosition = new kakao.maps.LatLng(latitude, longitude);
+      createMarkerAndOverlay(markerPosition, festival);
+    }
+  });
+}
+
+export { rendMap, HighlightOverlay };
