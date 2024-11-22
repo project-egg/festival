@@ -10,6 +10,17 @@ const $infoSection = document.querySelector(".info-section");
 const $festivalGrid = document.querySelector(".festival-grid");
 const $festivalCard = document.querySelector(".festival-card");
 
+
+// 요소 선택
+// const openModalButton = document.getElementById("open-modal");
+const closeWindowButton = document.getElementById("close-window");
+const newWindow = document.getElementById("new-window");
+// const overlay = document.getElementById("overlay");
+const overlay = document.querySelector("#overlay");
+
+// 모달 DOM
+const $newWindowBody = document.querySelector('.new-window-body');
+
 setCalendarDate();
 
 // 특수문자 변환
@@ -54,7 +65,7 @@ function rendData(datas) {
 
     const $newFestivalCard = document.createElement("div");
     $newFestivalCard.classList.add("festival-card");
-    $newFestivalCard.setAttribute("id", data.insttCode);
+    $newFestivalCard.setAttribute("id", data.id);
     $newFestivalCard.innerHTML = `              <h3>${transText}</h3>
       <p>${data.fstvlStartDate} ~ ${data.fstvlEndDate}</p>
       <p>${address}</p>`;
@@ -66,6 +77,68 @@ $searchBtn.addEventListener("click", (e) => {
   rendData(festivalDatas);
 });
 
-$dropdown.addEventListener("click", (e) => {
-  $dropdownToggle.textContent = e.target.innerText;
+// 새로운 창 열기
+// openModalButton.addEventListener("click", () => {
+//   newWindow.classList.remove("hidden");
+//   overlay.classList.remove("hidden");
+// });
+
+// 새로운 창 닫기
+closeWindowButton.addEventListener("click", closeNewWindow);
+overlay.addEventListener("click", closeNewWindow);
+
+// 닫기 함수
+function closeNewWindow() {
+  newWindow.classList.add("hidden");
+  overlay.classList.add("hidden");
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeNewWindow();
+});
+
+
+
+
+$festivalGrid.addEventListener('click',e=>{
+const target = e.target;
+const itemNode = target.closest('.festival-card');
+
+console.log(`==================`);
+
+newWindow.classList.remove("hidden");
+overlay.classList.remove("hidden");
+
+let name;
+let festival;
+let period;
+let deadline;
+let institutionalname;
+let numbers;
+let address;
+festivalDatas.forEach((data)=>{
+  if (String(data.id) === itemNode.id) {
+    name = data.fstvlNm;
+    festival = data.fstvlCo;
+    numbers = data.phoneNumber;
+    period = data.fstvlStartDate;
+    deadline = data.fstvlEndDate;
+    institutionalname = data.mnnstNm;
+    address = data.homepageUrl;
+    console.log(numbers);
+  }else{
+  
+  }
+
+});
+
+//모달에 데이터 뿌리기
+$newWindowBody.innerHTML = 
+`<p>축제이름:${name}</p>
+<p>축제내용:${festival}</p>
+<p>소재지도로명주소:</p>
+<p>축제기간:${period} ~ ${deadline}</p>
+<p>주최기관명:${institutionalname}</p> 
+<p>전화번호:${numbers}</p>
+<p>홈페이지주소:${address}</p>`;
 });
