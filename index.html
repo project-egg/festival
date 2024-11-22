@@ -12,6 +12,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
       rel="stylesheet"
     />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   </head>
   <body>
     <header>
@@ -31,7 +32,27 @@
     <div class="wrap">
       <div class="region-and-monthly">
         <section class="filters">
-          <button>지역</button>
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+              전체
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+              <li><a class="dropdown-item" id ="item-all" href="#">전체</a></li>
+              <li><a class="dropdown-item" id="item-gangwon" href="#">강원</a></li>
+              <li><a class="dropdown-item" id="item-gyeonggi" href="#">경기</a></li>
+              <li><a class="dropdown-item" id="item-gyeongsang" href="#">경상</a></li>
+              <li><a class="dropdown-item" id="item-gwangju" href="#">광주</a></li>
+              <li><a class="dropdown-item" id="item-daegu" href="#">대구</a></li>
+              <li><a class="dropdown-item" id="item-daejeon" href="#">대전</a></li>
+              <li><a class="dropdown-item" id="item-busan" href="#">부산</a></li>
+              <li><a class="dropdown-item" id="item-seoul" href="#">서울</a></li>
+              <li><a class="dropdown-item" id="item-ulsan" href="#">울산</a></li>
+              <li><a class="dropdown-item" id="item-incheon" href="#">인천</a></li>
+              <li><a class="dropdown-item" id="item-jeolla" href="#">전라</a></li>
+              <li><a class="dropdown-item" id="item-chungcheong" href="#">충청</a></li>
+              <li><a class="dropdown-item" id="item-jeju" href="#">제주</a></li>
+            </ul>
+          </div>
         </section>
         <section class="month-to-month">
           <button>월별 드롭다운</button>
@@ -59,6 +80,9 @@
       rel="stylesheet"
       href="/src/css/calendar.css"
     />
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    
     <script
     type="text/javascript"
     src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a37b0a7851906a105de603997f89eea0"
