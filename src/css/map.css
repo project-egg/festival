@@ -13,7 +13,7 @@
   border: 0;
   box-shadow: 0px 1px 2px #888;
 }
-.customoverlay .overlay {
+.customoverlay .c-overlay {
   display: block;
   text-decoration: none;
   color: #000;

@@ -68,7 +68,7 @@ function rendData(datas) {
       return address.includes(selectedDropdown);
     });
 
-  
+    rendMap(filterData);
   console.log("filter", filterData);
 
   //리스트 초기화
@@ -122,6 +122,9 @@ document.addEventListener("keydown", (e) => {
 $festivalGrid.addEventListener('click',e=>{
 const target = e.target;
 const itemNode = target.closest('.festival-card');
+if (itemNode) {    
+  HighlightOverlay(itemNode.id);
+}
 
 console.log(`==================`);
 
@@ -170,11 +173,4 @@ $dropdownMenu.addEventListener("click", (e) => {
   console.log("click");
 
   rendData(festivalDatas);
-});
-
-$festivalGrid.addEventListener("click", (e) => {
-  const festivalCard = e.target.closest(".festival-card")
-  if (festivalCard) {    
-    HighlightOverlay(festivalCard.id);
-  }
 });

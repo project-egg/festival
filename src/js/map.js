@@ -2,14 +2,21 @@ import festivalDatas from "./festival.js";
 
 const container = document.getElementById("map"); // 지도를 담을 영역의 DOM 레퍼런스
 let currentSelectedId = null; // 현재 선택된 id를 저장
+let markers = [];
+let overlays = []; 
 
 const options = {
-  center: new kakao.maps.LatLng(36, 127.6), // 지도의 중심좌표
+  center: new kakao.maps.LatLng(36.2, 127.6), // 지도의 중심좌표
   level: 13, // 지도의 레벨
 };
 
 const map = new kakao.maps.Map(container, options); // 지도 생성 및 객체 리턴
 const geocoder = new kakao.maps.services.Geocoder(); // 주소-좌표 변환 객체 생성
+
+function unescapeHtml(str) {
+  const doc = new DOMParser().parseFromString(str, "text/html");
+  return doc.body.textContent || "";
+}
 
 // 마커와 커스텀 오버레이를 생성하는 함수
 function createMarkerAndOverlay(position, festival) {
@@ -25,13 +32,16 @@ function createMarkerAndOverlay(position, festival) {
   });
 
   marker.setMap(map); // 마커를 지도 위에 표시
+  markers.push(marker); // 마커를 배열에 추가
 
   const content = document.createElement("div");
   content.className = "customoverlay";
   content.setAttribute("data-id", festival.id); // data-id 속성 추가
+  
+  const festivalTitle = unescapeHtml(festival.fstvlNm);
   content.innerHTML = `
-    <div class="overlay">
-      <span class="title">${festival.fstvlNm}</span>
+    <div class="c-overlay">
+      <span class="title">${festivalTitle}</span>
     </div>
   `;
 
@@ -42,8 +52,10 @@ function createMarkerAndOverlay(position, festival) {
     yAnchor: 0,
   });
 
+  overlays.push(customOverlay); // 오버레이를 배열에 추가
+
   // 오버레이 클릭 이벤트 리스너 추가
-  const overlayLink = content.querySelector(".overlay");
+  const overlayLink = content.querySelector(".c-overlay");
   overlayLink.addEventListener("click", (e) => {
     e.preventDefault(); // 기본 링크 동작 방지
     HighlightOverlay(festival.id);
@@ -75,8 +87,19 @@ function HighlightOverlay(selectedId) {
 }
 
 function rendMap(data) {
-  console.log(`rendMap ${data.length}`);
+  console.log(`rend : ${data.length}`);
   
+  // 기존 마커와 오버레이 제거
+  markers.forEach(marker => {
+    marker.setMap(null); // 지도에서 마커 제거
+  });
+  markers = []; // 마커 배열 초기화
+
+  overlays.forEach(overlay => {
+    overlay.setMap(null); // 지도에서 오버레이 제거
+  });
+  overlays = []; // 오버레이 배열 초기화
+
   // 축제 데이터를 기반으로 마커와 오버레이 생성
   data.forEach((festival) => {
     const latitude = parseFloat(festival.latitude);
@@ -105,5 +128,4 @@ function rendMap(data) {
   });
 }
 
-rendMap(festivalDatas);
 export { rendMap, HighlightOverlay };
