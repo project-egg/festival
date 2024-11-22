@@ -26,11 +26,12 @@ console.log(today);
 const pickerStart = new Pikaday({
   field: document.getElementById("start-calendar"),
   onSelect: function (date) {
+    const option = 'start';
     selectedDate = formatDate(date);
-    setCalendarDate(selectedDate);
+    setCalendarDate(selectedDate,option);
   },
   firstDay: 1,
-  minDate: new Date(2024, 10, 1), // 2024년 11월 1일부터
+  minDate: new Date(), // 2024년 11월 1일부터
   maxDate: new Date(2025, 12, 31), // 2024년 12월 31일까지
   yearRange: [2024, 2025],
   format: 'D MMM YYYY',
@@ -83,11 +84,12 @@ const pickerStart = new Pikaday({
 const pickerEnd = new Pikaday({
   field: document.getElementById("end-calendar"),
   onSelect: function(date) {
+    const option = 'end';
     selectedDate = formatDate(date);
-    setCalendarDate(selectedDate);
+    setCalendarDate(selectedDate,option);
   },
   firstDay: 1,
-  minDate: new Date(2024, 10, 1), // 2024년 11월 1일부터
+  minDate: new Date(), // 2024년 11월 1일부터
   maxDate: new Date(2025, 12, 31), // 2024년 12월 31일까지
   yearRange: [2024, 2025],
   format: 'D MMM YYYY',
@@ -138,7 +140,8 @@ const pickerEnd = new Pikaday({
 });
 
 
-function setCalendarDate(inputDate) {
+function setCalendarDate(inputDate,option) {
+
   // 시작일이 변경되면 시작일 기준으로 종료일이 +7일 되는 부분 (안씀 지금은)
   const date = new Date();
   
@@ -155,12 +158,24 @@ function setCalendarDate(inputDate) {
     return;
   }
   
+  console.log(subSevenDays(inputDate),'input');
+  console.log(addSevenDays(today),'777');
+  
+
+  // 검색가능한 날짜는 당일~ 
+  if(option==="end" && today>subSevenDays(inputDate)){
+    $startDay.value = today;
+  }
 
   // 1. 종료일이 시작일보다 이전일 경우
   // 20일~인데 ~1일을 하려고함
   if ($startDay.value > inputDate) {
+    if(inputDate<subSevenDays(today)){
+      $startDay.value = today;
+    }
 
-    $startDay.value = divSevenDays(inputDate);
+    $startDay.value = subSevenDays(inputDate);
+
     // 2. 시작일이 종료일보다 이후일 경우
     // ~20일 인데 21일~을 하려고함
   } else if (inputDate > $endDay.value) {
@@ -189,7 +204,7 @@ function addSevenDays(beforeDate) {
   return afterDate
 }
 
-function divSevenDays(beforeDate) {
+function subSevenDays(beforeDate) {
   
   const date2 = new Date(beforeDate);
   const date = new Date();
