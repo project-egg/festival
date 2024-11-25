@@ -9,6 +9,7 @@ const $dropdown = document.querySelector(".dropdown-menu");
 const $dropdownToggle = document.querySelector(".dropdown-toggle");
 const $dropdownMenu = document.querySelector(".dropdown-menu");
 
+const $searchInput = document.querySelector(".search-bar>input");
 const $searchBtn = document.getElementById("searchBtn");
 const $startDay = document.getElementById("start-calendar");
 
@@ -40,8 +41,8 @@ function unescapeHtml(str) {
 function rendData(datas) {
   const startDay = $startDay.value;
   const endDay = $endDay.value;
-
   const selectedDropdown = $dropdownToggle.innerText;
+  const searchTerm = $searchInput.value.toLowerCase(); // 검색어를 소문자로 변환
 
   console.log(datas);
 
@@ -66,7 +67,11 @@ function rendData(datas) {
         return data;
       }
       return address.includes(selectedDropdown);
-    });
+    })
+    .filter((data) => {
+      const festivalName = unescapeHtml(data.fstvlNm).toLowerCase().replace(/\s+/g, ''); // 공백 제거
+      return festivalName.includes(searchTerm);
+    });    
 
     rendMap(filterData);
   console.log("filter", filterData);
@@ -99,8 +104,14 @@ function rendData(datas) {
   
 }
 
-$searchBtn.addEventListener("click", (e) => {
+$searchInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    $searchBtn.click();
+  }
+});
 
+$searchBtn.addEventListener("click", (e) => {
   rendData(festivalDatas);
 });
 
