@@ -2,6 +2,7 @@ const container = document.getElementById("map"); // 지도를 담을 영역의 
 let currentSelectedId = null; // 현재 선택된 id를 저장
 let markers = [];
 let overlays = [];
+let clusterer; // 클러스터러 추가
 
 const options = {
   center: new kakao.maps.LatLng(36.2, 127.6), // 지도의 중심좌표
@@ -11,13 +12,20 @@ const options = {
 const map = new kakao.maps.Map(container, options); // 지도 생성 및 객체 리턴
 const geocoder = new kakao.maps.services.Geocoder(); // 주소-좌표 변환 객체 생성
 
+// 클러스터러 초기화
+clusterer = new kakao.maps.MarkerClusterer({
+  map: map,
+  averageCenter: true,
+  minLevel: 1, // 클러스터링을 시작할 최소 레벨 설정
+});
+
 function unescapeHtml(str) {
   const doc = new DOMParser().parseFromString(str, "text/html");
   return doc.body.textContent || "";
 }
 
-// 마커와 커스텀 오버레이를 생성하는 함수
-function createMarkerAndOverlay(position, festival) {
+// 마커를 생성하는 함수
+function createMarker(position) {
   const markerImage = new kakao.maps.MarkerImage(
     "../../assets/images/festival.png",
     new kakao.maps.Size(25, 25),
@@ -31,7 +39,10 @@ function createMarkerAndOverlay(position, festival) {
 
   marker.setMap(map); // 마커를 지도 위에 표시
   markers.push(marker); // 마커를 배열에 추가
+}
 
+// 커스텀 오버레이를 생성하는 함수
+function createCustomOverlay(position, festival) {
   const content = document.createElement("div");
   content.className = "customoverlay";
   content.setAttribute("data-id", festival.id); // data-id 속성 추가
@@ -44,13 +55,10 @@ function createMarkerAndOverlay(position, festival) {
   `;
 
   const customOverlay = new kakao.maps.CustomOverlay({
-    map: map,
     position: position,
     content: content,
     yAnchor: 0,
   });
-
-  overlays.push(customOverlay); // 오버레이를 배열에 추가
 
   // 오버레이 클릭 이벤트 리스너 추가
   const overlayLink = content.querySelector(".c-overlay");
@@ -58,13 +66,25 @@ function createMarkerAndOverlay(position, festival) {
     e.preventDefault(); // 기본 링크 동작 방지
     highlightOverlay(festival.id);
   });
+
+  return customOverlay; // 커스텀 오버레이 반환
+}
+
+// 마커와 커스텀 오버레이를 생성하는 함수
+function createMarkerAndOverlay(position, festival) {
+  createMarker(position);
+  const customOverlay = createCustomOverlay(position, festival);
+
+  // 클러스터러에 커스텀 오버레이 추가
+  clusterer.addMarker(customOverlay); // 커스텀 오버레이 추가
+
+  overlays.push(customOverlay); // 오버레이를 배열에 추가
 }
 
 // 같은 위치에 있는 오버레이 재배치
 function reposSamePosOverlays() {
   const positionMap = {};
 
-  // 각 오버레이의 위치를 추적하기 위한 맵 생성
   overlays.forEach((overlay) => {
     const position = overlay.getPosition();
     const key = `${position.getLat()},${position.getLng()}`; // 위도와 경도를 키로 사용
@@ -75,14 +95,15 @@ function reposSamePosOverlays() {
     positionMap[key].push(overlay);
   });
 
-  // 각 위치에 대해 오버레이 재배치
   Object.values(positionMap).forEach((overlaysAtPos) => {
     if (overlaysAtPos.length > 1) {
-      // 동일한 위치에 있는 경우
       overlaysAtPos.forEach((overlay, index) => {
         const originalPosition = overlay.getPosition();
-        const verticalOffset = index * 0.0001; // 오프셋 조정 (필요에 따라 변경 가능)
-        const adjustedPosition = new kakao.maps.LatLng(originalPosition.getLat() + verticalOffset, originalPosition.getLng());
+        const verticalOffset = index * 0.0001; // 오프셋 조정
+        const adjustedPosition = new kakao.maps.LatLng(
+          originalPosition.getLat() + verticalOffset,
+          originalPosition.getLng()
+        );
 
         overlay.setPosition(adjustedPosition); // 새로운 위치로 재배치
       });
@@ -104,12 +125,10 @@ function deselectOverlay() {
 
 // 선택된 오버레이 색 변경
 function highlightOverlay(selectedId) {
-  // 기존 선택 id와 다를 경우에만 클래스 제거 및 추가
   if (currentSelectedId === selectedId) return;
 
   deselectOverlay();
 
-  // 선택된 제목에 클래스 추가
   const selectedTitle = document.querySelector(
     `.customoverlay[data-id='${selectedId}'] .title`
   );
@@ -117,25 +136,30 @@ function highlightOverlay(selectedId) {
     selectedTitle.classList.add("selected-title");
   }
 
-  // 현재 선택된 id 업데이트
-  currentSelectedId = selectedId;  
+  currentSelectedId = selectedId;
 }
 
 function rendMap(data) {
-  console.log(`rend : ${data.length}`);
-
   // 기존 마커와 오버레이 제거
   markers.forEach((marker) => {
     marker.setMap(null); // 지도에서 마커 제거
   });
-  markers = []; // 마커 배열 초기화
+  markers = []; // 마커 배열 초기화  
 
+  // 기존 오버레이 제거
   overlays.forEach((overlay) => {
     overlay.setMap(null); // 지도에서 오버레이 제거
   });
   overlays = []; // 오버레이 배열 초기화
 
-  // 축제 데이터를 기반으로 마커와 오버레이 생성
+  // 클러스터러 초기화
+  clusterer = new kakao.maps.MarkerClusterer({
+    map: map,
+    averageCenter: true,
+    minLevel: 10, // 클러스터링을 시작할 최소 레벨 설정
+  });
+
+  // 축제 데이터를 기반으로 커스텀 오버레이 생성
   data.forEach((festival) => {
     const latitude = parseFloat(festival.latitude);
     const longitude = parseFloat(festival.longitude);
@@ -160,9 +184,8 @@ function rendMap(data) {
       const markerPosition = new kakao.maps.LatLng(latitude, longitude);
       createMarkerAndOverlay(markerPosition, festival);
     }
-    // 모든 오버레이가 생성된 후에 재배치 함수 호출
   });
-  
+
   reposSamePosOverlays();
 }
 
