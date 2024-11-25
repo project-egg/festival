@@ -9,6 +9,8 @@ const apiUrl = `http://api.data.go.kr/openapi/tn_pubr_public_cltur_fstvl_api?ser
 
 const festivalDatas = await fetchFestivalData(apiUrl);
 
+
+// api 데이터 호출 
 async function fetchFestivalData(apiUrl) {
 
     const response = await fetch(apiUrl); // API 호출
@@ -20,13 +22,13 @@ async function fetchFestivalData(apiUrl) {
     const date = new Date();
     const today = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
   
-    console.log(today);
-    
+    // xmlToJson.js 에서 emport
     const jsonData = xmlToJson(XmlNode);
     const festivalRes = jsonData.response.body.items.item;
     let index = 0;
     console.log(festivalRes);
     
+    // 당일 날짜 이후 데이터만 필터
     const filteredByTodayData = festivalRes.filter((data)=>{
       return data.fstvlEndDate >= today;
     }).map(data=>{
@@ -34,6 +36,7 @@ async function fetchFestivalData(apiUrl) {
       let url = null;
 
       // 주소 도로명 주소 우선 표시
+      // rdnmadr - 도로명 주소 / lnmadr - 지번 주소
       if (data.rdnmadr !== null && typeof data.rdnmadr === "object") {
         address = data.lnmadr;
       } else {
@@ -54,12 +57,13 @@ async function fetchFestivalData(apiUrl) {
       // + 기호 제거
       const mnnstNm = data.mnnstNm.replace(/\+/g, '');
       const auspcInsttNm =data.auspcInsttNm.replace(/\+/g, '');
+      const fstvlCo =data.fstvlCo.replace(/\+/g, '');
 
       return {
         latitude : data.latitude,
         longitude: data.longitude,
         auspcInsttNm: auspcInsttNm,  // 축제기관
-        fstvlCo: data.fstvlCo,  // 축제 상세
+        fstvlCo: fstvlCo,  // 축제 상세
         fstvlEndDate: data.fstvlEndDate, // 종료일
         fstvlNm: data.fstvlNm, // 축제이름
         fstvlStartDate: data.fstvlStartDate, // 시작일

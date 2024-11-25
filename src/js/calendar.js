@@ -11,11 +11,13 @@ let selectedDate = null;
 const inputElementStart = document.getElementById("start-calendar");
 const inputElementEnd = document.getElementById("start-calendar");
 
-console.log(today);
 
+// pikaday 라이브러리 사용
 // 축제 시작날짜 캘린더
 const pickerStart = new Pikaday({
   field: document.getElementById("start-calendar"),
+
+  // 캘린더에 날짜를 선택했을 때 
   onSelect: function (date) {
     const option = "start";
     selectedDate = formatDate(date);
@@ -25,7 +27,7 @@ const pickerStart = new Pikaday({
   firstDay: 1,
   minDate: new Date(), // 2024년 11월 1일부터
   maxDate: new Date(2025, 12, 31), // 2024년 12월 31일까지
-  yearRange: [2024, 2025],
+  yearRange: [2024, 2025], // 년도 드롭다운
   format: "D MMM YYYY",
 
   //한국어 설정
@@ -76,9 +78,10 @@ const pickerStart = new Pikaday({
 });
 
 // 축제 종료일 선택 캘린더
-
 const pickerEnd = new Pikaday({
   field: document.getElementById("end-calendar"),
+
+    // 캘린더에 날짜를 선택했을 때 
   onSelect: function (date) {
     const option = "end";
     selectedDate = formatDate(date);
@@ -88,7 +91,7 @@ const pickerEnd = new Pikaday({
   firstDay: 1,
   minDate: new Date(), // 2024년 11월 1일부터
   maxDate: new Date(2025, 12, 31), // 2024년 12월 31일까지
-  yearRange: [2024, 2025],
+  yearRange: [2024, 2025], // 년도 드롭다운 
   format: "D MMM YYYY",
 
   // 한국어 설정
@@ -138,6 +141,7 @@ const pickerEnd = new Pikaday({
   },
 });
 
+// 날짜 선택 시 input박스에 그려지는 텍스트 설정
 function setCalendarDate(inputDate, option) {
   const date = new Date();
 
@@ -154,13 +158,12 @@ function setCalendarDate(inputDate, option) {
     return;
   }
 
-  console.log(subSevenDays(inputDate), "input");
-  console.log(addSevenDays(today), "777");
-
-  // 검색가능한 날짜는 당일~
+  // 검색가능한 날짜는 당일~ 2025년
   if (option === "end" && today > subSevenDays(inputDate)) {
     $startDay.value = today;
   }
+
+  // 시작일~종료일 에 모순이 생길 경우엔 7일기간으로 날짜 변경되도록
 
   // 1. 종료일이 시작일보다 이전일 경우
   // 20일~인데 ~1일을 하려고함
@@ -188,23 +191,26 @@ function formatDate(date) {
 }
 
 
+// 날짜에 7일을 더해서 yyyy-mm-dd 형식으로 반환해주는 함수
 function addSevenDays(beforeDate) {
-  const date2 = new Date(beforeDate);
-  const date = new Date();
-  date.setDate(date2.getDate() + 7);
-  const afterDate = `${date.getFullYear()}-${String(
-    date.getMonth() + 1
-  ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  const beforeDateObj = new Date(beforeDate);
+  const todayObj = new Date();
+  todayObj.setDate(beforeDateObj.getDate() + 7);
+  const afterDate = `${todayObj.getFullYear()}-${String(
+    todayObj.getMonth() + 1
+  ).padStart(2, "0")}-${String(todayObj.getDate()).padStart(2, "0")}`;
   return afterDate;
 }
 
+// 날짜에 7일을 빼서 yyyy-mm-dd 형식으로 반환해주는 함수
 function subSevenDays(beforeDate) {
-  const date2 = new Date(beforeDate);
-  const date = new Date();
-  date.setDate(date2.getDate() - 7);
-  const afterDate = `${date.getFullYear()}-${String(
-    date.getMonth() + 1
-  ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  const beforeDateObj = new Date(beforeDate);
+  const todayObj = new Date();
+  todayObj.setDate(beforeDateObj.getDate() - 7);
+  const afterDate = `${todayObj.getFullYear()}-${String(
+    todayObj.getMonth() + 1
+  ).padStart(2, "0")}-${String(todayObj.getDate()).padStart(2, "0")}`;
   return afterDate;
 }
+
 export { setCalendarDate };
