@@ -17,15 +17,8 @@
   <body>
     <header>
       <div class="logo">프로젝트명</div>
-      <input type="text" id="start-calendar"/>
-      <input type="text" id="end-calendar"/>
-      <button id="searchBtn" value="검색">검색</button>
       
-      <div class="search-bar">
-        <!-- 검색창 HTML -->
-        <input type="text" placeholder="검색어를 입력하세요" />
-        <button><i class="fa-solid fa-magnifying-glass"></i></button>
-      </div>
+
     </header>
 
 
@@ -55,10 +48,17 @@
               <li><a class="dropdown-item" id="item-jeju" href="#">제주</a></li>
             </ul>
           </div>
+
+          <div class="calendar-wrap">
+            <input class = calendar type="text" id="start-calendar" readonly />
+            <input class = calendar type="text" id="end-calendar" readonly />
+          </div>
         </section>
-        <section class="month-to-month">
-          <button>월별 드롭다운</button>
-        </section>
+        <div class="search-bar">
+          <!-- 검색창 HTML -->
+          <input type="text" placeholder="검색어를 입력하세요" />
+          <button id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
       </div>
       <div class="main-container">
         <!-- 지도 영역 -->
@@ -79,8 +79,7 @@
       <!-- 모달 -->
       <div id="new-window" class="new-window hidden">
         <div class="new-window-header">
-          <span>새로운 창</span>
-          <button id="close-window">닫기</button>
+          <button id="close-window"><i class="fa-solid fa-x"></i></button>
         </div>
         <div class="new-window-body">
         </div>
