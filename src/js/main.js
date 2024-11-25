@@ -1,6 +1,6 @@
 import festivalDatas from "./festival.js";
 import { setCalendarDate } from "./calendar.js";
-import { rendMap, HighlightOverlay } from "./map.js";
+import { rendMap, highlightOverlay } from "./map.js";
 
 const $infoSection = document.querySelector(".info-section");
 
@@ -134,7 +134,7 @@ $festivalGrid.addEventListener('click',e=>{
 const target = e.target;
 const itemNode = target.closest('.festival-card');
 if (itemNode) {    
-  HighlightOverlay(itemNode.id);
+  highlightOverlay(itemNode.id);
 }
 
 console.log(`==================`);

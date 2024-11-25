@@ -56,7 +56,7 @@ function createMarkerAndOverlay(position, festival) {
   const overlayLink = content.querySelector(".c-overlay");
   overlayLink.addEventListener("click", (e) => {
     e.preventDefault(); // 기본 링크 동작 방지
-    HighlightOverlay(festival.id);
+    highlightOverlay(festival.id);
   });
 }
 
@@ -90,31 +90,35 @@ function reposSamePosOverlays() {
   });
 }
 
-// 선택된 오버레이 색 변경
-function HighlightOverlay(selectedId) {
-  // 현재 선택된 id와 다를 경우에만 클래스 제거 및 추가
-  if (currentSelectedId !== selectedId) {
-    // 기존 선택 요소 제거
-    if (currentSelectedId !== null) {
-      const previouslySelectedTitle = document.querySelector(
-        `.customoverlay[data-id='${currentSelectedId}'] .title`
-      );
-      if (previouslySelectedTitle) {
-        previouslySelectedTitle.classList.remove("selected-title"); // 이전 선택 클래스 제거
-      }
-    }
-
-    // 선택된 제목에 클래스 추가
-    const selectedTitle = document.querySelector(
-      `.customoverlay[data-id='${selectedId}'] .title`
+// 기존 선택 오버레이 제거
+function deselectOverlay() {
+  if (currentSelectedId !== null) {
+    const previouslySelectedTitle = document.querySelector(
+      `.customoverlay[data-id='${currentSelectedId}'] .title`
     );
-    if (selectedTitle) {
-      selectedTitle.classList.add("selected-title");
+    if (previouslySelectedTitle) {
+      previouslySelectedTitle.classList.remove("selected-title"); // 이전 선택 클래스 제거
     }
-
-    // 현재 선택된 id 업데이트
-    currentSelectedId = selectedId;
   }
+}
+
+// 선택된 오버레이 색 변경
+function highlightOverlay(selectedId) {
+  // 기존 선택 id와 다를 경우에만 클래스 제거 및 추가
+  if (currentSelectedId === selectedId) return;
+
+  deselectOverlay();
+
+  // 선택된 제목에 클래스 추가
+  const selectedTitle = document.querySelector(
+    `.customoverlay[data-id='${selectedId}'] .title`
+  );
+  if (selectedTitle) {
+    selectedTitle.classList.add("selected-title");
+  }
+
+  // 현재 선택된 id 업데이트
+  currentSelectedId = selectedId;  
 }
 
 function rendMap(data) {
@@ -162,4 +166,4 @@ function rendMap(data) {
   reposSamePosOverlays();
 }
 
-export { rendMap, HighlightOverlay };
+export { rendMap, highlightOverlay };
