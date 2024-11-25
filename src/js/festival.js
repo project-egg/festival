@@ -30,20 +30,44 @@ async function fetchFestivalData(apiUrl) {
     const filteredByTodayData = festivalRes.filter((data)=>{
       return data.fstvlEndDate >= today;
     }).map(data=>{
+      let address = null;
+      let url = null;
+
+      // 주소 도로명 주소 우선 표시
+      if (data.rdnmadr !== null && typeof data.rdnmadr === "object") {
+        address = data.lnmadr;
+      } else {
+        address = data.rdnmadr;
+      }
+      
+      if (!address) {
+        address = "주소없음";
+      }
+
+      // 홈페이지 주소가 없을 경우
+      if (data.homepageUrl !== null && typeof data.homepageUrl === "object") {
+        url = "지자체 홈페이지를 확인해주세요.";
+      }else{
+        url = data.homepageUrl;
+      }
+
+      // + 기호 제거
+      const mnnstNm = data.mnnstNm.replace(/\+/g, '');
+      const auspcInsttNm =data.auspcInsttNm.replace(/\+/g, '');
+
       return {
         latitude : data.latitude,
         longitude: data.longitude,
-        auspcInsttNm: data.auspcInsttNm,  // 축제기관
+        auspcInsttNm: auspcInsttNm,  // 축제기관
         fstvlCo: data.fstvlCo,  // 축제 상세
         fstvlEndDate: data.fstvlEndDate, // 종료일
         fstvlNm: data.fstvlNm, // 축제이름
         fstvlStartDate: data.fstvlStartDate, // 시작일
-        homepageUrl: data.homepageUrl, // 홈페이지 주소
-        lnmadr: data.lnmadr, // 지번
-        mnnstNm: data.mnnstNm, // 개최기관?
+        homepageUrl: url, // 홈페이지 주소
+        address : address,  // 주소
+        mnnstNm: mnnstNm, // 개최기관?
         opar: data.opar, // 장소명
         phoneNumber: data.phoneNumber, //전화번호
-        rdnmadr: data.rdnmadr, // 도로명주소
         id: index++, // id 값에 인덱스를 1씩 증가
       };
     })

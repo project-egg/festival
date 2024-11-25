@@ -81,24 +81,13 @@ function rendData(datas) {
 
   filterData.forEach((data) => {
     const transText = unescapeHtml(data.fstvlNm);
-    let address = null;
-
-    // 주소 도로명 주소 우선 표시
-    if (data.rdnmadr !== null && typeof data.rdnmadr === "object") {
-      address = data.lnmadr;
-    } else {
-      address = data.rdnmadr;
-    }
-    if (!address) {
-      address = "주소없음";
-    }
 
     const $newFestivalCard = document.createElement("div");
     $newFestivalCard.classList.add("festival-card");
     $newFestivalCard.setAttribute("id", data.id);
     $newFestivalCard.innerHTML = `              <h3>${transText}</h3>
       <p>${data.fstvlStartDate} ~ ${data.fstvlEndDate}</p>
-      <p>${address}</p>`;
+      <p>${data.address}</p>`;
     $festivalGrid.append($newFestivalCard);
   });  
   
@@ -149,31 +138,32 @@ let deadline;
 let institutionalname;
 let numbers;
 let address;
+let url;
 festivalDatas.forEach((data)=>{
   if (String(data.id) === itemNode.id) {
-    name = data.fstvlNm;
-    festival = data.fstvlCo;
+    name = unescapeHtml(data.fstvlNm);
+    festival = unescapeHtml(data.fstvlCo);
+    address = data.address;
     numbers = data.phoneNumber;
     period = data.fstvlStartDate;
     deadline = data.fstvlEndDate;
     institutionalname = data.mnnstNm;
-    address = data.homepageUrl;
-    console.log(numbers);
-  }else{
-  
+    url = data.homepageUrl;
   }
 
 });
 
 //모달에 데이터 뿌리기
+// url 이 있는 경우에만 하이퍼링크 적용
 $newWindowBody.innerHTML = 
-`<p>축제이름:${name}</p>
-<p>축제내용:${festival}</p>
-<p>소재지도로명주소:</p>
-<p>축제기간:${period} ~ ${deadline}</p>
-<p>주최기관명:${institutionalname}</p> 
-<p>전화번호:${numbers}</p>
-<p>홈페이지주소:${address}</p>`;
+`<strong>${name}</strong>
+<p></p>
+<p>축제내용: ${festival}</p>
+<p>주소: ${address}</p>
+<p>축제기간: ${period} ~ ${deadline}</p>
+<p>주최기관명: ${institutionalname}</p> 
+<p>전화번호: ${numbers}</p>
+ <p>홈페이지주소: ${url.includes("http") ? `<a href="${url}">${url}</a>` : '지자체 홈페이지를 참고해주세요.'}</p>`
 });
 
 $dropdown.addEventListener("click", (e) => {
