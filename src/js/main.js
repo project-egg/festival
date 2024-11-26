@@ -2,6 +2,9 @@ import festivalDatas from "./festival.js";
 import { setCalendarDate } from "./calendar.js";
 import { rendMap, HighlightOverlay } from "./map.js";
 
+let latitude;
+let longitude;
+
 const $infoSection = document.querySelector(".info-section");
 
 // 드랍다운 DOM
@@ -27,13 +30,9 @@ const overlay = document.querySelector("#overlay");
 // 모달 DOM
 const $newWindowBody = document.querySelector(".new-window-body");
 
-
-
 //초기 렌딩 함수 실행
 setCalendarDate();
 rendData(festivalDatas);
-
-
 
 // 특수문자 변환
 function unescapeHtml(str) {
@@ -57,12 +56,11 @@ function rendData(datas) {
     )
     // 지역 조건에 맞게 필터 ('도/광역시 드롭다운메뉴 기준')
     .filter((data) => {
-      
       // 전체는 모든 데이터 반환
       if (selectedDropdown.includes("전체")) {
         return data;
       }
-      return  data.address.includes(selectedDropdown);
+      return data.address.includes(selectedDropdown);
     })
     .filter((data) => {
       const festivalName = unescapeHtml(data.fstvlNm)
@@ -100,6 +98,8 @@ function rendModalData(itemNode) {
   let numbers;
   let address;
   let url;
+  let latitude;
+  let longitude;
 
   festivalDatas.forEach((data) => {
     if (String(data.id) === itemNode.id) {
@@ -111,6 +111,8 @@ function rendModalData(itemNode) {
       deadline = data.fstvlEndDate;
       institutionalname = data.mnnstNm;
       url = data.homepageUrl;
+      latitude = data.latitude;
+      longitude = data.longitude;
     }
     console.log(festival);
   });
@@ -132,6 +134,7 @@ function rendModalData(itemNode) {
 
   const $title = document.createElement("p");
   $title.textContent = unescapeHtml(name);
+  $title.style.color = "#6a5acd";
   $title.classList.add("modal-title");
   $newWindowBody.appendChild($title);
 
@@ -162,7 +165,12 @@ function rendModalData(itemNode) {
   // 전화번호
   const $numbers = document.createElement("p");
   $numbers.classList.add("modal-numbers");
-  $numbers.textContent = `전화번호 : ${numbers}`;
+
+  if (numbers !== null && typeof numbers === "object") {
+    $numbers.textContent = `전화번호 : 지자체 홈페이지를 확인해주세요.`;
+  } else {
+    $numbers.textContent = `전화번호 : ${numbers}`;
+  }
   $newWindowBody.appendChild($numbers);
 
   // 홈페이지주소
@@ -175,16 +183,47 @@ function rendModalData(itemNode) {
     aTag.textContent = `${url}`;
     $url.appendChild(aTag);
   } else {
-    $url.textContent = "지자체 홈페이지를 참고해주세요.";
+    $url.textContent = " 홈페이지 주소 : 지자체 홈페이지를 확인해주세요.";
   }
   $newWindowBody.appendChild($url);
 
-  const $map = document.createElement('div');
-  $map.classList.add("modal-map");
+  const $map = document.createElement("div");
+  // $map.classList.add("modal-map");
+  $map.setAttribute("id", "modal-map");
+  if (latitude !== null && typeof latitude !== "object") {
+    $map.classList.add("boder");
+  }
   $newWindowBody.append($map);
-
   // 모달 열기
   openNewWindow();
+
+  if (latitude !== null && typeof latitude !== "object") {
+    modalMap(latitude, longitude);
+  }
+}
+
+// 모달창 지도 이미지 (마커포함) 랜더링 함수
+function modalMap(latitude, longitude) {
+  const markerPosition = new kakao.maps.LatLng(latitude, longitude);
+
+  // 이미지 지도에 표시할 마커입니다
+  // 이미지 지도에 표시할 마커는 Object 형태입니다
+  const marker = {
+    position: markerPosition,
+  };
+
+  const staticMapContainer2 = document.getElementById("modal-map"), // 이미지 지도를 표시할 div
+    staticMapOption2 = {
+      center: new kakao.maps.LatLng(latitude, longitude), // 이미지 지도의 중심좌표
+      level: 3, // 이미지 지도의 확대 레벨
+      marker: marker,
+    };
+
+  // 이미지 지도를 표시할 div와 옵션으로 이미지 지도를 생성합니다
+  const staticMap = new kakao.maps.StaticMap(
+    staticMapContainer2,
+    staticMapOption2
+  );
 }
 
 // 모달 닫기
@@ -196,6 +235,8 @@ function closeNewWindow() {
 function openNewWindow() {
   newWindow.classList.remove("hidden");
   overlay.classList.remove("hidden");
+  // 모달 창 열릴 때 가장 상단으로 스크롤 위치하게
+  $newWindowBody.scrollTop = 0;
 }
 
 //=======================================================================================
