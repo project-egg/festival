@@ -12,20 +12,13 @@ const options = {
 const map = new kakao.maps.Map(container, options); // 지도 생성 및 객체 리턴
 const geocoder = new kakao.maps.services.Geocoder(); // 주소-좌표 변환 객체 생성
 
-// 클러스터러 초기화
-clusterer = new kakao.maps.MarkerClusterer({
-  map: map,
-  averageCenter: true,
-  minLevel: 1, // 클러스터링을 시작할 최소 레벨 설정
-});
-
 function unescapeHtml(str) {
   const doc = new DOMParser().parseFromString(str, "text/html");
   return doc.body.textContent || "";
 }
 
 // 마커를 생성하는 함수
-function createMarker(position) {
+function createMarker(position, festival) {
   const markerImage = new kakao.maps.MarkerImage(
     "../../assets/images/festival.png",
     new kakao.maps.Size(25, 25),
@@ -37,8 +30,10 @@ function createMarker(position) {
     image: markerImage,
   });
 
-  marker.setMap(map); // 마커를 지도 위에 표시
-  markers.push(marker); // 마커를 배열에 추가
+  marker.dataId = festival.id;
+  console.log(`marker.dataId : ${marker.dataId}, festival.id : ${festival.id}`);
+
+  return marker;
 }
 
 // 커스텀 오버레이를 생성하는 함수
@@ -60,6 +55,8 @@ function createCustomOverlay(position, festival) {
     yAnchor: 0,
   });
 
+  customOverlay.dataId = festival.id;
+
   // 오버레이 클릭 이벤트 리스너 추가
   const overlayLink = content.querySelector(".c-overlay");
   overlayLink.addEventListener("click", (e) => {
@@ -72,12 +69,13 @@ function createCustomOverlay(position, festival) {
 
 // 마커와 커스텀 오버레이를 생성하는 함수
 function createMarkerAndOverlay(position, festival) {
-  createMarker(position);
+  const marker = createMarker(position, festival);
   const customOverlay = createCustomOverlay(position, festival);
 
   // 클러스터러에 커스텀 오버레이 추가
-  clusterer.addMarker(customOverlay); // 커스텀 오버레이 추가
+  clusterer.addMarker(marker); // 커스텀 오버레이 추가
 
+  markers.push(marker); // 마커를 배열에 추가
   overlays.push(customOverlay); // 오버레이를 배열에 추가
 }
 
@@ -144,7 +142,7 @@ function rendMap(data) {
   markers.forEach((marker) => {
     marker.setMap(null); // 지도에서 마커 제거
   });
-  markers = []; // 마커 배열 초기화  
+  markers = []; // 마커 배열 초기화
 
   // 기존 오버레이 제거
   overlays.forEach((overlay) => {
@@ -156,7 +154,7 @@ function rendMap(data) {
   clusterer = new kakao.maps.MarkerClusterer({
     map: map,
     averageCenter: true,
-    minLevel: 10, // 클러스터링을 시작할 최소 레벨 설정
+    minLevel: 8, // 클러스터링을 시작할 최소 레벨 설정
   });
 
   // 축제 데이터를 기반으로 커스텀 오버레이 생성
@@ -184,6 +182,30 @@ function rendMap(data) {
       const markerPosition = new kakao.maps.LatLng(latitude, longitude);
       createMarkerAndOverlay(markerPosition, festival);
     }
+  });
+
+  // 클러스터링 이벤트에서 오버레이 표시 관리
+  kakao.maps.event.addListener(clusterer, "clustered", function (clusters) {
+    console.log(`clustered 호출`);
+
+    markers.forEach((marker) => {
+      const isInCluster = clusters.some((cluster) =>
+        cluster.getMarkers().includes(marker)
+      ); // 클러스터에 포함된 마커인지 확인
+
+      const overlay = overlays.find((o) => o.dataId === marker.dataId); // dataId로 오버레이 찾기
+      if (!isInCluster) {
+        // 클러스터에 포함되지 않은 마커에 오버레이 표시
+        if (overlay) {
+          overlay.setMap(map);
+        }
+      } else {
+        // 클러스터에 포함된 마커의 오버레이 숨김
+        if (overlay) {
+          overlay.setMap(null);
+        }
+      }
+    });
   });
 
   reposSamePosOverlays();
