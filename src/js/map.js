@@ -6,7 +6,7 @@ let clusterer; // 클러스터러 추가
 
 const options = {
   center: new kakao.maps.LatLng(36.2, 127.6), // 지도의 중심좌표
-  level: 13, // 지도의 레벨
+  level: 12, // 지도의 레벨
 };
 
 const map = new kakao.maps.Map(container, options); // 지도 생성 및 객체 리턴
@@ -45,7 +45,7 @@ function createCustomOverlay(position, festival) {
   const festivalTitle = unescapeHtml(festival.fstvlNm);
   content.innerHTML = `
     <div class="c-overlay">
-      <span class="title">${festivalTitle}</span>
+      <span class="title" id="map-${festival.id}">${festivalTitle}</span>
     </div>
   `;
 
@@ -56,13 +56,6 @@ function createCustomOverlay(position, festival) {
   });
 
   customOverlay.dataId = festival.id;
-
-  // 오버레이 클릭 이벤트 리스너 추가
-  const overlayLink = content.querySelector(".c-overlay");
-  overlayLink.addEventListener("click", (e) => {
-    e.preventDefault(); // 기본 링크 동작 방지
-    highlightOverlay(festival.id);
-  });
 
   return customOverlay; // 커스텀 오버레이 반환
 }
@@ -132,6 +125,7 @@ function highlightOverlay(selectedId) {
   );
   if (selectedTitle) {
     selectedTitle.classList.add("selected-title");
+    
   }
 
   currentSelectedId = selectedId;
