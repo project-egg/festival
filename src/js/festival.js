@@ -20,18 +20,23 @@ async function fetchFestivalData(apiUrl) {
 
     // xml형식을 json으로 파싱
     const date = new Date();
-    const today = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    const today = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
   
+    console.log('aasda',date);
+    console.log('aasda',today);
+    
     // xmlToJson.js 에서 emport
     const jsonData = xmlToJson(XmlNode);
     const festivalRes = jsonData.response.body.items.item;
     let index = 0;
     console.log(festivalRes);
-    
+   
     // 당일 날짜 이후 데이터만 필터
     const filteredByTodayData = festivalRes.filter((data)=>{
+ 
       return data.fstvlEndDate >= today;
     }).map(data=>{
+
       let address = null;
       let url = null;
 

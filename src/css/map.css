@@ -22,7 +22,7 @@
   font-size: 12px;
   font-weight: bold;
   overflow: hidden;
-  background: #d95050
+  background: #505ed9
     url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/arrow_white.png)
     no-repeat right 14px center;
 }
@@ -36,7 +36,7 @@
   font-weight: bold;
 }
 .customoverlay .selected-title {
-  background: yellow;
+  background: rgb(241, 241, 128);
 }
 .customoverlay:after {
   content: "";

@@ -1,6 +1,6 @@
 import festivalDatas from "./festival.js";
 import { setCalendarDate } from "./calendar.js";
-import { rendMap, HighlightOverlay } from "./map.js";
+import { rendMap, highlightOverlay } from "./map.js";
 
 let latitude;
 let longitude;
@@ -102,7 +102,7 @@ function rendModalData(itemNode) {
   let longitude;
 
   festivalDatas.forEach((data) => {
-    if (String(data.id) === itemNode.id) {
+    if (String(data.id) === itemNode) {
       name = unescapeHtml(data.fstvlNm);
       festival = unescapeHtml(data.fstvlCo);
       address = data.address;
@@ -114,7 +114,7 @@ function rendModalData(itemNode) {
       latitude = data.latitude;
       longitude = data.longitude;
     }
-    console.log(festival);
+    console.log(url);
   });
 
   //모달에 데이터 뿌리기
@@ -177,6 +177,8 @@ function rendModalData(itemNode) {
   const $url = document.createElement("p");
   $url.classList.add("modal-url");
   $url.textContent = `홈페이지 주소 : `;
+  console.log(url);
+
   if (url.includes("http")) {
     const aTag = document.createElement("a");
     aTag.href = url;
@@ -266,9 +268,9 @@ $festivalGrid.addEventListener("click", (e) => {
   const target = e.target;
   const itemNode = target.closest(".festival-card");
   if (itemNode) {
-    HighlightOverlay(itemNode.id);
+    highlightOverlay(itemNode.id);
   }
-  rendModalData(itemNode);
+  rendModalData(itemNode.id);
 });
 
 // 드롭다운 클릭 이벤트
@@ -278,4 +280,17 @@ $dropdown.addEventListener("click", (e) => {
 
 $dropdownMenu.addEventListener("click", (e) => {
   rendData(festivalDatas);
+});
+
+// 오버레이 클릭 이벤트 리스너 추가
+const overlayLink = document.getElementById("map");
+overlayLink.addEventListener("click", (e) => {
+  e.preventDefault(); // 기본 링크 동작 방지
+  if (e.target.tagName === "SPAN") {
+    const targetId = e.target.id;
+    const id = targetId.replace("map-", "");
+    console.log(id);
+    highlightOverlay(id);
+    rendModalData(id);
+  }
 });
