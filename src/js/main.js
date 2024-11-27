@@ -1,6 +1,6 @@
 import festivalDatas from "./festival.js";
 import { setCalendarDate } from "./calendar.js";
-import { rendMap, highlightOverlay } from "./map.js";
+import { rendMap, highlightOverlay, deselectOverlay } from "./map.js";
 
 let latitude;
 let longitude;
@@ -232,6 +232,7 @@ function modalMap(latitude, longitude) {
 function closeNewWindow() {
   newWindow.classList.add("hidden");
   overlay.classList.add("hidden");
+  deselectOverlay();
 }
 // 모달 열기
 function openNewWindow() {
