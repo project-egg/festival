@@ -1,12 +1,16 @@
 const container = document.getElementById("map"); // 지도를 담을 영역의 DOM 레퍼런스
+let mapCenter = {
+  latitude : 36.2,
+  longitude : 127.6,
+}
 let currentSelectedId = null; // 현재 선택된 id를 저장
 let markers = [];
 let overlays = [];
 let clusterer; // 클러스터러 추가
 
 const options = {
-  center: new kakao.maps.LatLng(36.2, 127.6), // 지도의 중심좌표
-  level: 12, // 지도의 레벨
+  center: new kakao.maps.LatLng(mapCenter.latitude, mapCenter.longitude), // 지도의 중심좌표
+  level: 13, // 지도의 레벨
 };
 
 const map = new kakao.maps.Map(container, options); // 지도 생성 및 객체 리턴
@@ -31,7 +35,6 @@ function createMarker(position, festival) {
   });
 
   marker.dataId = festival.id;
-  console.log(`marker.dataId : ${marker.dataId}, festival.id : ${festival.id}`);
 
   return marker;
 }
@@ -65,8 +68,7 @@ function createMarkerAndOverlay(position, festival) {
   const marker = createMarker(position, festival);
   const customOverlay = createCustomOverlay(position, festival);
 
-  // 클러스터러에 커스텀 오버레이 추가
-  clusterer.addMarker(marker); // 커스텀 오버레이 추가
+  clusterer.addMarker(marker);   // 클러스터러에 마커 추가
 
   markers.push(marker); // 마커를 배열에 추가
   overlays.push(customOverlay); // 오버레이를 배열에 추가
@@ -131,6 +133,50 @@ function highlightOverlay(selectedId) {
   currentSelectedId = selectedId;
 }
 
+function clusterHandler(clusters) {
+  console.log(`clustered 호출`);
+
+  markers.forEach((marker) => {
+    const isInCluster = clusters.some((cluster) =>
+      cluster.getMarkers().includes(marker)
+    ); // 클러스터에 포함된 마커인지 확인
+
+    const overlay = overlays.find((o) => o.dataId === marker.dataId); // dataId로 오버레이 찾기
+    if (!isInCluster) {
+      // 클러스터에 포함되지 않은 마커에 오버레이 표시
+      if (overlay) {
+        overlay.setMap(map);
+      }
+    } else {
+      // 클러스터에 포함된 마커의 오버레이 숨김
+      if (overlay) {
+        overlay.setMap(null);
+      }
+    }
+  });
+}
+
+function updateOverlaysVisibility(clusters) {    
+  markers.forEach((marker) => {
+    const isInCluster = clusters.some((cluster) =>
+      cluster.getMarkers().includes(marker)
+    ); // 클러스터에 포함된 마커인지 확인
+
+    const overlay = overlays.find((o) => o.dataId === marker.dataId); // dataId로 오버레이 찾기
+    if (!isInCluster) {
+      // 클러스터에 포함되지 않은 마커에 오버레이 표시
+      if (overlay) {
+        overlay.setMap(map);
+      }
+    } else {
+      // 클러스터에 포함된 마커의 오버레이 숨김
+      if (overlay) {
+        overlay.setMap(null);
+      }
+    }
+  });
+}
+
 function rendMap(data) {
   // 기존 마커와 오버레이 제거
   markers.forEach((marker) => {
@@ -180,29 +226,14 @@ function rendMap(data) {
 
   // 클러스터링 이벤트에서 오버레이 표시 관리
   kakao.maps.event.addListener(clusterer, "clustered", function (clusters) {
-    console.log(`clustered 호출`);
-
-    markers.forEach((marker) => {
-      const isInCluster = clusters.some((cluster) =>
-        cluster.getMarkers().includes(marker)
-      ); // 클러스터에 포함된 마커인지 확인
-
-      const overlay = overlays.find((o) => o.dataId === marker.dataId); // dataId로 오버레이 찾기
-      if (!isInCluster) {
-        // 클러스터에 포함되지 않은 마커에 오버레이 표시
-        if (overlay) {
-          overlay.setMap(map);
-        }
-      } else {
-        // 클러스터에 포함된 마커의 오버레이 숨김
-        if (overlay) {
-          overlay.setMap(null);
-        }
-      }
-    });
+    updateOverlaysVisibility(clusters)
   });
 
+  // 맵 로드 시에 updateOverlaysVisibility 호출을 위해 중심좌표 이동
+  map.setCenter(new kakao.maps.LatLng(mapCenter.latitude + 0.05 , mapCenter.longitude));
+
   reposSamePosOverlays();
+
 }
 
 export { rendMap, highlightOverlay };
