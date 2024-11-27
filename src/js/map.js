@@ -52,8 +52,7 @@ function createCustomOverlay(position, festival) {
     </div>
   `;
 
-  console.log(`overlay 생성`);
-  
+  // console.log(`overlay 생성`);  
   const customOverlay = new kakao.maps.CustomOverlay({
     position: position,
     content: content,
@@ -108,7 +107,7 @@ function reposSamePosOverlays() {
 
 // 기존 선택 오버레이 제거
 function deselectOverlay() {
-  console.log(`deselectOverlay} : ${currentSelectedId}`);
+  // console.log(`deselectOverlay} : ${currentSelectedId}`);
   
   if (currentSelectedId !== null) {
     const previouslySelectedTitle = document.querySelector(
@@ -135,35 +134,42 @@ function highlightOverlay(selectedId) {
   currentSelectedId = selectedId;
 }
 
-function updateOverlaysVisibility(clusters) {  
+function updateOverlaysVisibility(clusters) {
   // console.log("=====================updateOverlaysVisibility");
-    
-  markers.forEach((marker) => {
-    const isInCluster = clusters.some((cluster) =>
-      cluster.getMarkers().includes(marker)
-    ); // 클러스터에 포함된 마커인지 확인
 
+  const currentLevel = map.getLevel(); // 현재 줌 레벨을 가져옵니다.
+  
+  console.log(`${currentLevel} ${clusterer.getMinLevel()}`);
+  markers.forEach((marker) => {
     const overlay = overlays.find((o) => o.dataId === marker.dataId); // dataId로 오버레이 찾기
-    if (!isInCluster) {
-      // 클러스터에 포함되지 않은 마커에 오버레이 표시
+
+    if (currentLevel <= clusterer.getMinLevel()) {     
+      // 현재 레벨이 minLevel 이하인 경우 모든 오버레이를 표시합니다.
       if (overlay) {
         overlay.setMap(map);
-        //console.log("오버레이 표시");
-        
       }
     } else {
-      // 클러스터에 포함된 마커의 오버레이 숨김
-      if (overlay) {
-        overlay.setMap(null);
-        //console.log("오버레이 제거");
+      const isInCluster = clusters.some((cluster) =>
+        cluster.getMarkers().includes(marker)
+      ); // 클러스터에 포함된 마커인지 확인
+
+      if (!isInCluster) {
+        // 클러스터에 포함되지 않은 마커에 오버레이 표시
+        if (overlay) {
+          overlay.setMap(map);
+        }
+      } else {
+        // 클러스터에 포함된 마커의 오버레이 숨김
+        if (overlay) {
+          overlay.setMap(null);
+        }
       }
     }
   });
 }
 
 function rendMap(data) {
-  console.log("rendMap");  
-  
+  //console.log("rendMap");  
   // 기존 마커와 오버레이 제거
   markers.forEach((marker) => {
     marker.setMap(null); // 지도에서 마커 제거
@@ -182,7 +188,7 @@ function rendMap(data) {
   clusterer = new kakao.maps.MarkerClusterer({
     map: map,
     averageCenter: true,
-    minLevel: 1, // 클러스터링을 시작할 최소 레벨 설정
+    minLevel: 10,
   });
 
   // 축제 데이터를 기반으로 커스텀 오버레이 생성
