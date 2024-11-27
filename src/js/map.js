@@ -52,6 +52,8 @@ function createCustomOverlay(position, festival) {
     </div>
   `;
 
+  console.log(`overlay 생성`);
+  
   const customOverlay = new kakao.maps.CustomOverlay({
     position: position,
     content: content,
@@ -126,16 +128,14 @@ function highlightOverlay(selectedId) {
     `.customoverlay[data-id='${selectedId}'] .title`
   );
   if (selectedTitle) {
-    selectedTitle.classList.add("selected-title");
-    
+    selectedTitle.classList.add("selected-title");    
   }
-
   currentSelectedId = selectedId;
 }
 
-function clusterHandler(clusters) {
-  console.log(`clustered 호출`);
-
+function updateOverlaysVisibility(clusters) {  
+  console.log("=====================updateOverlaysVisibility");
+    
   markers.forEach((marker) => {
     const isInCluster = clusters.some((cluster) =>
       cluster.getMarkers().includes(marker)
@@ -146,55 +146,41 @@ function clusterHandler(clusters) {
       // 클러스터에 포함되지 않은 마커에 오버레이 표시
       if (overlay) {
         overlay.setMap(map);
+        //console.log("오버레이 표시");
+        
       }
     } else {
       // 클러스터에 포함된 마커의 오버레이 숨김
       if (overlay) {
         overlay.setMap(null);
-      }
-    }
-  });
-}
-
-function updateOverlaysVisibility(clusters) {    
-  markers.forEach((marker) => {
-    const isInCluster = clusters.some((cluster) =>
-      cluster.getMarkers().includes(marker)
-    ); // 클러스터에 포함된 마커인지 확인
-
-    const overlay = overlays.find((o) => o.dataId === marker.dataId); // dataId로 오버레이 찾기
-    if (!isInCluster) {
-      // 클러스터에 포함되지 않은 마커에 오버레이 표시
-      if (overlay) {
-        overlay.setMap(map);
-      }
-    } else {
-      // 클러스터에 포함된 마커의 오버레이 숨김
-      if (overlay) {
-        overlay.setMap(null);
+        //console.log("오버레이 제거");
       }
     }
   });
 }
 
 function rendMap(data) {
+  console.log("rendMap");  
+  
   // 기존 마커와 오버레이 제거
   markers.forEach((marker) => {
     marker.setMap(null); // 지도에서 마커 제거
   });
-  markers = []; // 마커 배열 초기화
+  markers = []; // 마커 배열 초기화  
 
   // 기존 오버레이 제거
   overlays.forEach((overlay) => {
     overlay.setMap(null); // 지도에서 오버레이 제거
   });
-  overlays = []; // 오버레이 배열 초기화
-
-  // 클러스터러 초기화
+  overlays = []; // 오버레이 배열 초기화  
+  
+  if (clusterer) {    
+    clusterer.clear(); // 클러스터러의 모든 마커를 제거
+  }
   clusterer = new kakao.maps.MarkerClusterer({
     map: map,
     averageCenter: true,
-    minLevel: 8, // 클러스터링을 시작할 최소 레벨 설정
+    minLevel: 1, // 클러스터링을 시작할 최소 레벨 설정
   });
 
   // 축제 데이터를 기반으로 커스텀 오버레이 생성
@@ -210,15 +196,19 @@ function rendMap(data) {
       latitude > 90 ||
       longitude < -180 ||
       longitude > 180
-    ) {
-      // 주소로 좌표를 검색
-      geocoder.addressSearch(festival.rdnmadr, function (result, status) {
-        if (status === kakao.maps.services.Status.OK) {
-          const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-          createMarkerAndOverlay(coords, festival);
-        }
-      });
-    } else {
+    ) {  
+      if (festival.address) {
+        // 도로명 주소로 좌표를 검색
+        geocoder.addressSearch(festival.address, function (result, status) {
+          if (status === kakao.maps.services.Status.OK) {
+            const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+            createMarkerAndOverlay(coords, festival);
+          } else { // 주소 검색 실패 (ex. 장소 미지정)
+            console.log(`${festival.fstvlNm} 주소 검색 실패: ${status}`);
+          }
+        });
+      }
+    } else { // 위도 경도 잘 있는 경우
       const markerPosition = new kakao.maps.LatLng(latitude, longitude);
       createMarkerAndOverlay(markerPosition, festival);
     }
@@ -230,10 +220,12 @@ function rendMap(data) {
   });
 
   // 맵 로드 시에 updateOverlaysVisibility 호출을 위해 중심좌표 이동
-  map.setCenter(new kakao.maps.LatLng(mapCenter.latitude + 0.05 , mapCenter.longitude));
+  mapCenter.latitude += 0.01;
+  console.log(`mapCenter.latitude: ${mapCenter.latitude}`);
+  
+  map.setCenter(new kakao.maps.LatLng(mapCenter.latitude, mapCenter.longitude));
 
   reposSamePosOverlays();
-
 }
 
 export { rendMap, highlightOverlay };
