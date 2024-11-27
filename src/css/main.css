@@ -19,13 +19,13 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 2rem 1rem 0rem;
   width: 100%;
   background-color: #f8f9fa;
 }
-header .logo {
-  font-weight: 700;
-  font-size: 18px;
+header .logo img {
+  width: 180px; 
+  height: 80px;
 }
 
 .search-bar {
@@ -124,7 +124,7 @@ header .logo {
   max-width: 100%; /* 화면 최대 너비 제한 */
   margin: 0 auto; /* 가운데 정렬 */
   display: flex;
-  height: 100vh;
+  height: 730px;
 }
 .calendar-wrap {
   height: 80%;
