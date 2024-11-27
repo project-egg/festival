@@ -108,6 +108,8 @@ function reposSamePosOverlays() {
 
 // 기존 선택 오버레이 제거
 function deselectOverlay() {
+  console.log(`deselectOverlay} : ${currentSelectedId}`);
+  
   if (currentSelectedId !== null) {
     const previouslySelectedTitle = document.querySelector(
       `.customoverlay[data-id='${currentSelectedId}'] .title`
@@ -120,7 +122,7 @@ function deselectOverlay() {
 
 // 선택된 오버레이 색 변경
 function highlightOverlay(selectedId) {
-  if (currentSelectedId === selectedId) return;
+  if (currentSelectedId == null && currentSelectedId === selectedId) return;
 
   deselectOverlay();
 
@@ -134,7 +136,7 @@ function highlightOverlay(selectedId) {
 }
 
 function updateOverlaysVisibility(clusters) {  
-  console.log("=====================updateOverlaysVisibility");
+  // console.log("=====================updateOverlaysVisibility");
     
   markers.forEach((marker) => {
     const isInCluster = clusters.some((cluster) =>
@@ -221,11 +223,11 @@ function rendMap(data) {
 
   // 맵 로드 시에 updateOverlaysVisibility 호출을 위해 중심좌표 이동
   mapCenter.latitude += 0.01;
-  console.log(`mapCenter.latitude: ${mapCenter.latitude}`);
+  // console.log(`mapCenter.latitude: ${mapCenter.latitude}`);
   
   map.setCenter(new kakao.maps.LatLng(mapCenter.latitude, mapCenter.longitude));
 
   reposSamePosOverlays();
 }
 
-export { rendMap, highlightOverlay };
+export { rendMap, highlightOverlay, deselectOverlay };
