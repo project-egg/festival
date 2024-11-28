@@ -8,21 +8,21 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
 )}-${String(date.getDate()).padStart(2, "0")}`;
 let selectedDate = null;
 
-const inputElementStart = document.getElementById("start-calendar");
-const inputElementEnd = document.getElementById("start-calendar");
-
-
 // pikaday 라이브러리 사용
 // 축제 시작날짜 캘린더
 const pickerStart = new Pikaday({
   field: document.getElementById("start-calendar"),
 
-  // 캘린더에 날짜를 선택했을 때 
+  // 캘린더에 날짜를 선택했을 때
   onSelect: function (date) {
     const option = "start";
     selectedDate = formatDate(date);
     setCalendarDate(selectedDate, option);
     document.getElementById("searchBtn").click();
+  },
+  onOpen: function () {
+    const inputDate = stringToDate($startDay.value);
+    pickerEnd.gotoDate(inputDate);
   },
   firstDay: 1,
   minDate: new Date(), // 2024년 11월 1일부터
@@ -81,17 +81,21 @@ const pickerStart = new Pikaday({
 const pickerEnd = new Pikaday({
   field: document.getElementById("end-calendar"),
 
-    // 캘린더에 날짜를 선택했을 때 
+  // 캘린더에 날짜를 선택했을 때
   onSelect: function (date) {
     const option = "end";
     selectedDate = formatDate(date);
     setCalendarDate(selectedDate, option);
     document.getElementById("searchBtn").click();
   },
+  onOpen: function () {
+    const inputDate = stringToDate($endDay.value);
+    pickerEnd.gotoDate(inputDate);
+  },
   firstDay: 1,
   minDate: new Date(), // 2024년 11월 1일부터
   maxDate: new Date(2025, 12, 31), // 2024년 12월 31일까지
-  yearRange: [2024, 2025], // 년도 드롭다운 
+  yearRange: [2024, 2025], // 년도 드롭다운
   format: "D MMM YYYY",
 
   // 한국어 설정
@@ -190,26 +194,32 @@ function formatDate(date) {
   return `${year}-${month}-${day}`;
 }
 
+function stringToDate(dateString) {
+  const [year, month, day] = dateString.split("-");
+  return new Date(year, month - 1, day); // month는 0부터 시작하므로 -1을 해줍니다.
+}
 
 // 날짜에 7일을 더해서 yyyy-mm-dd 형식으로 반환해주는 함수
 function addSevenDays(beforeDate) {
-  const beforeDateObj = new Date(beforeDate);
-  const todayObj = new Date();
-  todayObj.setDate(beforeDateObj.getDate() + 7);
-  const afterDate = `${todayObj.getFullYear()}-${String(
-    todayObj.getMonth() + 1
-  ).padStart(2, "0")}-${String(todayObj.getDate()).padStart(2, "0")}`;
+  const beforeDateObj = new Date(beforeDate); // 입력된 날짜를 Date 객체로 변환
+  beforeDateObj.setDate(beforeDateObj.getDate() + 7); // 7일을 더함
+
+  const afterDate = `${beforeDateObj.getFullYear()}-${String(
+    beforeDateObj.getMonth() + 1
+  ).padStart(2, "0")}-${String(beforeDateObj.getDate()).padStart(2, "0")}`;
+
   return afterDate;
 }
 
 // 날짜에 7일을 빼서 yyyy-mm-dd 형식으로 반환해주는 함수
 function subSevenDays(beforeDate) {
-  const beforeDateObj = new Date(beforeDate);
-  const todayObj = new Date();
-  todayObj.setDate(beforeDateObj.getDate() - 7);
-  const afterDate = `${todayObj.getFullYear()}-${String(
-    todayObj.getMonth() + 1
-  ).padStart(2, "0")}-${String(todayObj.getDate()).padStart(2, "0")}`;
+  const beforeDateObj = new Date(beforeDate); // 입력된 날짜를 Date 객체로 변환
+  beforeDateObj.setDate(beforeDateObj.getDate() - 7); // 7일을 뺌
+
+  const afterDate = `${beforeDateObj.getFullYear()}-${String(
+    beforeDateObj.getMonth() + 1
+  ).padStart(2, "0")}-${String(beforeDateObj.getDate()).padStart(2, "0")}`;
+
   return afterDate;
 }
 

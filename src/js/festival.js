@@ -4,7 +4,7 @@ const pageNo = 1;
 
 const apiKey =
   "3ih8%2BQR83rsvCEY8npFeJxn4kCUYoPwt%2BCGlm5t4iMup1WvwgEErvFno2bFeGwyZ20DymdWNc7mQlGVM8Pb9tg%3D%3D";
-const apiUrl = `https://api.data.go.kr/openapi/tn_pubr_public_cltur_fstvl_api?serviceKey=${apiKey}&pageNo=${pageNo}&numOfRows=1266`; // API 호출 URL
+const apiUrl = `http://api.data.go.kr/openapi/tn_pubr_public_cltur_fstvl_api?serviceKey=${apiKey}&pageNo=${pageNo}&numOfRows=1266`; // API 호출 URL
 
 
 const festivalDatas = await fetchFestivalData(apiUrl);
