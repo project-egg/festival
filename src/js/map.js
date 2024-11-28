@@ -7,6 +7,7 @@ let currentSelectedId = null; // 현재 선택된 id를 저장
 let markers = [];
 let overlays = [];
 let clusterer; // 클러스터러 추가
+let updateTimeout;
 
 const options = {
   center: new kakao.maps.LatLng(mapCenter.latitude, mapCenter.longitude), // 지도의 중심좌표
@@ -139,7 +140,7 @@ function updateOverlaysVisibility(clusters) {
 
   const currentLevel = map.getLevel(); // 현재 줌 레벨을 가져옵니다.
   
-  console.log(`${currentLevel} ${clusterer.getMinLevel()}`);
+  // console.log(`${currentLevel} ${clusterer.getMinLevel()}`);
   markers.forEach((marker) => {
     const overlay = overlays.find((o) => o.dataId === marker.dataId); // dataId로 오버레이 찾기
 
@@ -224,11 +225,18 @@ function rendMap(data) {
 
   // 클러스터링 이벤트에서 오버레이 표시 관리
   kakao.maps.event.addListener(clusterer, "clustered", function (clusters) {
-    updateOverlaysVisibility(clusters)
+    // 이전 호출이 남아있으면 취소
+    if (updateTimeout) {
+      clearTimeout(updateTimeout);
+    }
+  
+    // 30ms 후에 updateOverlaysVisibility 호출
+    updateTimeout = setTimeout(() => {
+      updateOverlaysVisibility(clusters);
+    }, 30);
   });
-
   // 맵 로드 시에 updateOverlaysVisibility 호출을 위해 중심좌표 이동
-  mapCenter.latitude += 0.01;
+  mapCenter.latitude += 0.005;
   // console.log(`mapCenter.latitude: ${mapCenter.latitude}`);
   
   map.setCenter(new kakao.maps.LatLng(mapCenter.latitude, mapCenter.longitude));
