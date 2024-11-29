@@ -192,21 +192,35 @@ function rendModalData(itemNode) {
   const $map = document.createElement("div");
   // $map.classList.add("modal-map");
   $map.setAttribute("id", "modal-map");
-  if (latitude !== null && typeof latitude !== "object") {
-    $map.classList.add("boder");
-  }
+
+  $map.classList.add("boder");
+
   $newWindowBody.append($map);
+
   // 모달 열기
   openNewWindow();
-
-  if (latitude !== null && typeof latitude !== "object") {
-    modalMap(latitude, longitude);
-  }
+  // 모달이 열린 후 지도 세팅해줘야함
+  modalMap(address);
 }
 
 // 모달창 지도 이미지 (마커포함) 랜더링 함수
-function modalMap(latitude, longitude) {
-  const markerPosition = new kakao.maps.LatLng(latitude, longitude);
+async function modalMap(address) {
+  const geocoder = new kakao.maps.services.Geocoder();
+
+  // Promise로 감싸서 비동기 처리
+  const { lat, lon } = await new Promise((resolve, reject) => {
+    geocoder.addressSearch(address, function (result, status) {
+      if (status === kakao.maps.services.Status.OK) {
+        const lat = result[0].y; // 위도
+        const lon = result[0].x; // 경도
+        resolve({ lat, lon });
+      } else {
+        reject(new Error("주소를 찾을 수 없습니다."));
+      }
+    });
+  });
+
+  const markerPosition = new kakao.maps.LatLng(lat, lon);
 
   // 이미지 지도에 표시할 마커입니다
   // 이미지 지도에 표시할 마커는 Object 형태입니다
@@ -216,7 +230,7 @@ function modalMap(latitude, longitude) {
 
   const staticMapContainer2 = document.getElementById("modal-map"), // 이미지 지도를 표시할 div
     staticMapOption2 = {
-      center: new kakao.maps.LatLng(latitude, longitude), // 이미지 지도의 중심좌표
+      center: new kakao.maps.LatLng(lat, lon), // 이미지 지도의 중심좌표
       level: 3, // 이미지 지도의 확대 레벨
       marker: marker,
     };
