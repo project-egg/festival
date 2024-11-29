@@ -272,7 +272,12 @@ header .logo img {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  cursor: pointer;
 }
+.festival-card:hover {
+  background-color: #cacaca;
+}
+
 
 .festival-card h3 {
   font-size: 18px;
